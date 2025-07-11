@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BusinessObjects.DTOs.User.Request
+{
+    public class UserRegisterRequestModel
+    {
+        [Required]
+        public string Name { get; set; } = null!;
+
+        [Required]
+        public string Email { get; set; } = null!;
+
+        [Required]
+        public string Password { get; set; } = null!;
+    }
+}
