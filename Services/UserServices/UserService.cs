@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Azure.Core;
 using BusinessObjects;
 using BusinessObjects.Constants;
 using BusinessObjects.DTOs.User.Request;
@@ -150,6 +151,22 @@ namespace Services.UserServices
             }
 
             _unitOfWork.Boards.Update(board);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task ChangePassword(UserChangePasswordRequestModel request, string? userId)
+        {
+            var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));
+
+            if (user == null) throw new CustomException("User not found");
+
+            bool isPasswordValid = PasswordHasher.VerifyPassword(request.OldPassword, user.Password, user.Salt);
+            if (!isPasswordValid) throw new CustomException("Old Password incorrect");
+
+            var (hashedPassword, newSalt) = PasswordHasher.HashNewPassword(request.NewPassword);
+            user.Password = hashedPassword;
+            user.Salt = newSalt;
+
             await _unitOfWork.SaveChangesAsync();
         }
     }

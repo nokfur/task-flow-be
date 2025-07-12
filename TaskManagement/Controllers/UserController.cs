@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using BusinessObjects.DTOs.User.Request;
 using BusinessObjects.DTOs.User.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -36,6 +37,17 @@ namespace TaskManagement.Controllers
 
             var response = await _userService.SearchUser(search, exeptIds);
             return Ok(response);
+        }
+
+        [HttpPatch]
+        [Authorize]
+        [Route("password")]
+        public async Task<IActionResult> ChangePassword(UserChangePasswordRequestModel request)
+        {
+            string? userId = HttpContext.User.FindFirstValue("id");
+            await _userService.ChangePassword(request, userId);
+
+            return Ok();
         }
     }
 }
