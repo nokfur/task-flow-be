@@ -13,7 +13,8 @@ namespace Services.BoardServices
     {
         Task<ICollection<BoardResponseModel>> GetBoardsByUserId(string? userId);
         Task<BoardDetailResponseModel> GetBoardDetailById(string id, string? userId);
-        Task<ICollection<BoardResponseModel>> GetBoardTemplates(string? userId);
+        Task<ICollection<BoardResponseModel>> GetBoardTemplates();
+        Task<ICollection<BoardTemplateResponseModel>> GetBoardTemplatesForSetup();
         Task AddBoardTemplate(BoardTemplateAddRequestModel request, string? userId);
 
         Task AddBoard(BoardAddRequestModel request, string? userId);

@@ -48,62 +48,19 @@ namespace Services.BoardServices
             return _mapper.Map<BoardDetailResponseModel>(board);
         }
 
-        public async Task<ICollection<BoardResponseModel>> GetBoardTemplates(string? userId)
+        public async Task<ICollection<BoardResponseModel>> GetBoardTemplates()
         {
             var boards = await _unitOfWork.Boards.GetAsync(b => b.IsTemplate, 
                 "Labels, Columns, Columns.Tasks, Columns.Tasks.Labels");
-            return _mapper.Map<ICollection<BoardResponseModel>>(boards, opt => { opt.Items["UserId"] = userId; });
+            return _mapper.Map<ICollection<BoardResponseModel>>(boards);
         }
 
-        private async Task<Board> CloneBoardFromTemplate(string templateId, Board board)
+        public async Task<ICollection<BoardTemplateResponseModel>> GetBoardTemplatesForSetup()
         {
-            var template = await _unitOfWork.Boards.SingleOrDefaultAsync(b => b.Id.Equals(templateId) && b.IsTemplate,
-                "Labels, Columns, Columns.Tasks, Columns.Tasks.Labels");
-
-            if (template == null) throw new CustomException("Template not found");
-
-            // 1. Clone labels
-            var labelMap = new Dictionary<string, Label>();
-            foreach (var label in template.Labels)
-            {
-                var newLabel = _mapper.Map<Label>(label);
-                newLabel.Id = Guid.NewGuid().ToString();
-                newLabel.BoardId = board.Id;
-
-                labelMap[label.Id] = newLabel;
-                board.Labels.Add(newLabel);
-            }
-
-            // 2. Clone columns and tasks
-            foreach (var col in template.Columns)
-            {
-                var newColumn = _mapper.Map<Column>(col);
-                newColumn.Id = Guid.NewGuid().ToString();
-                newColumn.BoardId = board.Id;
-
-                foreach (var task in col.Tasks)
-                {
-                    var newTask = _mapper.Map<WorkTask>(task);
-                    newTask.Id = Guid.NewGuid().ToString();
-                    newTask.CreatedAt = DateTime.Now;
-                    newTask.UpdatedAt = DateTime.Now;
-                    newTask.ColumnId = newColumn.Id;                    
-
-                    // Re-create TaskLabels using new label IDs
-                    newTask.TaskLabels = task.TaskLabels.Select(tl => new TaskLabel
-                    {
-                        TaskId = newTask.Id,
-                        LabelId = labelMap[tl.LabelId].Id
-                    }).ToList();
-
-                    newColumn.Tasks.Add(newTask);
-                }
-
-                board.Columns.Add(newColumn);
-            }
-
-            return board;
-        }
+            var boards = await _unitOfWork.Boards.GetAsync(b => b.IsTemplate,
+                "Columns");
+            return _mapper.Map<ICollection<BoardTemplateResponseModel>>(boards);
+        }        
 
         public async Task AddBoardTemplate(BoardTemplateAddRequestModel request, string? userId)
         {
@@ -149,6 +106,57 @@ namespace Services.BoardServices
             await _unitOfWork.SaveChangesAsync();
         }
 
+        private async Task CloneBoardFromTemplate(string templateId, Board board)
+        {
+            var template = await _unitOfWork.Boards.SingleOrDefaultAsync(b => b.Id.Equals(templateId) && b.IsTemplate,
+                "Labels, Columns, Columns.Tasks, Columns.Tasks.Labels");
+
+            if (template == null) throw new CustomException("Template not found");
+
+            // 1. Clone labels
+            var labelMap = new Dictionary<string, Label>();
+            foreach (var label in template.Labels)
+            {
+                var newLabel = _mapper.Map<Label>(label);
+                newLabel.Id = Guid.NewGuid().ToString();
+                newLabel.BoardId = board.Id;
+
+                labelMap[label.Id] = newLabel;
+                board.Labels.Add(newLabel);
+            }
+
+            // 2. Clone columns and tasks
+            foreach (var col in template.Columns)
+            {
+                var newColumn = _mapper.Map<Column>(col);
+                newColumn.Id = Guid.NewGuid().ToString();
+                newColumn.BoardId = board.Id;
+
+                foreach (var task in col.Tasks)
+                {
+                    var newTask = _mapper.Map<WorkTask>(task);
+                    newTask.Id = Guid.NewGuid().ToString();
+                    newTask.CreatedAt = DateTime.Now;
+                    newTask.UpdatedAt = DateTime.Now;
+                    newTask.ColumnId = newColumn.Id;
+
+                    // Re-create TaskLabels using new label IDs
+                    newTask.TaskLabels = task.Labels
+                                        .Where(l => labelMap.ContainsKey(l.Id))
+                                        .Select(l => new TaskLabel
+                                        {
+                                            LabelId = labelMap[l.Id].Id,
+                                            TaskId = newTask.Id
+                                        })
+                                        .ToList();
+
+                    newColumn.Tasks.Add(newTask);
+                }
+
+                board.Columns.Add(newColumn);
+            }
+        }
+
         public async Task AddBoard(BoardAddRequestModel request, string? userId)
         {
             var currentUser = await _unitOfWork.Users.SingleOrDefaultAsync(x => x.Id.Equals(userId));
@@ -160,12 +168,12 @@ namespace Services.BoardServices
             var newBoard = _mapper.Map<Board>(request);
             newBoard.OwnerId = userId;
                         
-            var boardMembers = _mapper.Map<ICollection<BoardMember>>(request.Members, opt => opt.Items["BoardId"] = newBoard.Id);
+            var boardMembers = _mapper.Map<ICollection<BoardMember>>(request.BoardMembers, opt => opt.Items["BoardId"] = newBoard.Id);
             newBoard.BoardMembers = boardMembers;
 
             if (!string.IsNullOrEmpty(request.TemplateId))
             {
-                newBoard = await CloneBoardFromTemplate(request.TemplateId, newBoard);
+                await CloneBoardFromTemplate(request.TemplateId, newBoard);
             }
 
             await _unitOfWork.Boards.AddAsync(newBoard);

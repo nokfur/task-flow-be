@@ -54,8 +54,7 @@ namespace TaskManagement.Controllers
         [Route("templates")]
         public async Task<IActionResult> GetBoardTemplates()
         {
-            var userId = HttpContext.User.FindFirstValue("id");
-            var response = await _boardService.GetBoardTemplates(userId);
+            var response = await _boardService.GetBoardTemplatesForSetup();
             return Ok(response);
         }        
 

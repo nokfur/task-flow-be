@@ -24,6 +24,14 @@ namespace TaskManagement.Controllers
             _boardService = boardService;
         }
 
+        [HttpGet]
+        [Route("templates")]
+        public async Task<IActionResult> GetBoardTemplates()
+        {
+            var response = await _boardService.GetBoardTemplates();
+            return Ok(response);
+        }
+
         [HttpPost]
         [Route("templates")]
         public async Task<IActionResult> AddBoardTemplate(BoardTemplateAddRequestModel request)

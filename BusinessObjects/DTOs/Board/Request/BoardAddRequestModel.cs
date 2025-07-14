@@ -17,6 +17,6 @@ namespace BusinessObjects.DTOs.Board.Request
 
         public string? TemplateId { get; set; }
 
-        public ICollection<MemberAddRequestModal> Members { get; set; } = new List<MemberAddRequestModal>();
+        public ICollection<MemberAddRequestModal> BoardMembers { get; set; } = new List<MemberAddRequestModal>();
     }
 }
