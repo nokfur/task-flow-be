@@ -17,5 +17,6 @@ namespace Services.UserServices
         Task AddMemberToBoard(string boardId, ICollection<string> emails);
         Task RemoveMemberFromBoard(string boardId, ICollection<string> emails);
         Task ChangePassword(UserChangePasswordRequestModel request, string? userId);
+        Task<ICollection<UserDetailResponseModel>> GetAllUsers();
     }
 }

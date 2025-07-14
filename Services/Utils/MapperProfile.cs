@@ -25,6 +25,8 @@ namespace Services.Utils
             // ============================================ User ============================================
             CreateMap<User, UserProfileResponseModel>();
 
+            CreateMap<User, UserDetailResponseModel>();
+
             CreateMap<UserRegisterRequestModel, User>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
 

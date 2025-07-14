@@ -57,17 +57,7 @@ namespace TaskManagement.Controllers
             var userId = HttpContext.User.FindFirstValue("id");
             var response = await _boardService.GetBoardTemplates(userId);
             return Ok(response);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        [Route("templates")]
-        public async Task<IActionResult> AddBoardTemplate(BoardTemplateAddRequestModel request)
-        {
-            var userId = HttpContext.User.FindFirstValue("id");
-            await _boardService.AddBoardTemplate(request, userId);
-            return Ok();
-        }
+        }        
 
         [HttpPost]
         [Authorize]

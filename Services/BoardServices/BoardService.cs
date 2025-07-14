@@ -180,7 +180,7 @@ namespace Services.BoardServices
             if (board == null) throw new CustomException("Board not found", 404);
             if (user == null) throw new CustomException("User not found", 404);
 
-            if ((board.IsTemplate && !user.Role.Equals(UserRoleEnum.Admin.ToString())) || 
+            if ((board.IsTemplate && !user.Role.Equals(UserRoles.Admin)) || 
                 !board.OwnerId.Equals(userId)) 
                 throw new CustomException("You are not allowed to perform this action", StatusCodes.Status403Forbidden);
             
@@ -201,7 +201,7 @@ namespace Services.BoardServices
             if (board == null) throw new CustomException("Board not found", 404);
             if (user == null) throw new CustomException("User not found", 404);
 
-            if ((board.IsTemplate && !user.Role.Equals(UserRoleEnum.Admin.ToString())) ||
+            if ((board.IsTemplate && !user.Role.Equals(UserRoles.Admin)) ||
                 !board.OwnerId.Equals(userId))
                 throw new CustomException("You are not allowed to perform this action", StatusCodes.Status403Forbidden);
 

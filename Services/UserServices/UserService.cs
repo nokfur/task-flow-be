@@ -89,7 +89,7 @@ namespace Services.UserServices
             newUser.Salt = salt;
 
             newUser.CreatedAt = DateTime.Now;
-            newUser.Role = UserRoleEnum.User.ToString();
+            newUser.Role = UserRoles.User;
 
             await _unitOfWork.Users.AddAsync(newUser);
             await _unitOfWork.SaveChangesAsync();
@@ -168,6 +168,13 @@ namespace Services.UserServices
             user.Salt = newSalt;
 
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<ICollection<UserDetailResponseModel>> GetAllUsers()
+        {
+            var users = await _unitOfWork.Users.GetAllAsync();
+
+            return _mapper.Map<ICollection<UserDetailResponseModel>>(users);
         }
     }
 }

@@ -155,7 +155,7 @@ namespace BusinessObjects
                 Password = "Vcdy30nqeMZFh2FCVp2F8uktoTqQcJcKU6Bf0oS2o30=", // 12345
                 Salt = "8GpL6j9M7maqTG/s928A0w==",
                 CreatedAt = new DateTime(2025, 5, 22, 15, 30, 0),
-                Role = UserRoleEnum.Admin.ToString()
+                Role = UserRoles.Admin
             });
         }
     }
