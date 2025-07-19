@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.User.Request
 {
-    public class UserChangePasswordRequestModel
+    public class MemberAddRequest
     {
         [Required]
-        public string OldPassword { get; set; } = null!;
+        public string MemberId { get; set; } = null!;
 
-        [Required] 
-        public string NewPassword { get;set; } = null!;
+        [Required]
+        public string Role {  get; set; } = null!;
     }
 }

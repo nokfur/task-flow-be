@@ -21,7 +21,7 @@ namespace TaskManagement.Controllers
         [Authorize]
         [HttpPut]
         [Route("{taskId}")]
-        public async Task<IActionResult> UpdateTask(string taskId, TaskUpdateRequestModel request)
+        public async Task<IActionResult> UpdateTask(string taskId, TaskUpdateRequest request)
         {
             await _taskService.UpdateTask(taskId, request);
             return Ok();
@@ -48,7 +48,7 @@ namespace TaskManagement.Controllers
         [Authorize]
         [HttpPatch]
         [Route("reorder")]
-        public async Task<IActionResult> ReorderTask(TaskReorderRequestModel request)
+        public async Task<IActionResult> ReorderTask(TaskReorderRequest request)
         {
             await _taskService.Reorder(request);
             return Ok();

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.User.Response
 {
-    public class UserLoginResponseModel
+    public class UserLoginResponse
     {
         public string Token { get; set; } = null!;
     }

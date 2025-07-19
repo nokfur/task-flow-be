@@ -4,20 +4,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BusinessObjects.Models;
+using BusinessObjects.DTOs.User.Request;
 
-namespace BusinessObjects.DTOs.WorkTask.Request
+namespace BusinessObjects.DTOs.Board.Request
 {
-    public class TaskAddRequestModel
+    public class BoardAddRequest
     {
         [Required]
         public string Title { get; set; } = null!;
 
         public string? Description { get; set; }
 
-        [Required]
-        public string Priority { get; set; } = null!;
+        public string? TemplateId { get; set; }
 
-        public DateTime? DueDate { get; set; }
+        public ICollection<MemberAddRequest> BoardMembers { get; set; } = new List<MemberAddRequest>();
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.User.Response
 {
-    public class UserDetailResponseModel
+    public class UserProfileResponse
     {
         public string Id { get; set; } = null!;
 
@@ -15,7 +15,5 @@ namespace BusinessObjects.DTOs.User.Response
         public string Email { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; }
-
-        public string Role { get; set; } = null!;
     }
 }

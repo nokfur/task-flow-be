@@ -25,7 +25,7 @@ namespace Services.ColumnServices
             _mapper = mapper;
         }
 
-        public async Task<ColumnDetailResponseModel> AddColumn(ColumnAddRequestModel request, string boardId)
+        public async Task<ColumnDetailResponse> AddColumn(ColumnAddRequest request, string boardId)
         {
             if (!await _unitOfWork.Boards.IsExistAsync(c => c.Id.Equals(boardId)))
                 throw new CustomException("Board Id not found");
@@ -44,10 +44,10 @@ namespace Services.ColumnServices
             await _unitOfWork.Columns.AddAsync(newColumn);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<ColumnDetailResponseModel>(newColumn);
+            return _mapper.Map<ColumnDetailResponse>(newColumn);
         }
 
-        public async Task UpdateColumn(string columnId, ColumnUpdateRequestModel request)
+        public async Task UpdateColumn(string columnId, ColumnUpdateRequest request)
         {
             var column = await _unitOfWork.Columns.SingleOrDefaultAsync(c => c.Id.Equals(columnId));
 
@@ -61,7 +61,7 @@ namespace Services.ColumnServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdateColumnPositions(List<ColumnPositionUpdateRequestModel> request)
+        public async Task UpdateColumnPositions(List<ColumnPositionUpdateRequest> request)
         {
             var requestIds = request.Select(c => c.Id).ToHashSet();
 

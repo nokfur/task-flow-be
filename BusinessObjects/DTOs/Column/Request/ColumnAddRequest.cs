@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.Column.Request
 {
-    public class ColumnUpdateRequestModel
+    public class ColumnAddRequest
     {
         [Required]
         public string Title { get; set; } = null!;

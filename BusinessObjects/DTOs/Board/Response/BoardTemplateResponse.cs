@@ -7,7 +7,7 @@ using BusinessObjects.DTOs.Column.Response;
 
 namespace BusinessObjects.DTOs.Board.Response
 {
-    public class BoardTemplateResponseModel
+    public class BoardTemplateResponse
     {
         public string Id { get; set; } = null!;
 

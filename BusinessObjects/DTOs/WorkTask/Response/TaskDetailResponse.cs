@@ -8,7 +8,7 @@ using BusinessObjects.Models;
 
 namespace BusinessObjects.DTOs.WorkTask.Response
 {
-    public class TaskDetailResponseModel
+    public class TaskDetailResponse
     {
         public string Id { get; set; } = null!;
 
@@ -26,6 +26,6 @@ namespace BusinessObjects.DTOs.WorkTask.Response
 
         public DateTime UpdatedAt { get; set; }
 
-        public ICollection<LabelDetailResponseModel> Labels { get; set; } = new List<LabelDetailResponseModel>();
+        public ICollection<LabelDetailResponse> Labels { get; set; } = new List<LabelDetailResponse>();
     }
 }

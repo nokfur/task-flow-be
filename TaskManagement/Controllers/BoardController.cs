@@ -60,7 +60,7 @@ namespace TaskManagement.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddBoard(BoardAddRequestModel request)
+        public async Task<IActionResult> AddBoard(BoardAddRequest request)
         {
             var userId = HttpContext.User.FindFirstValue("id");
             await _boardService.AddBoard(request, userId);
@@ -70,7 +70,7 @@ namespace TaskManagement.Controllers
         [HttpPut]
         [Authorize]
         [Route("{boardId}")]
-        public async Task<IActionResult> UpdateBoard(string boardId, BoardUpdateRequestModel request)
+        public async Task<IActionResult> UpdateBoard(string boardId, BoardUpdateRequest request)
         {
             var userId = HttpContext.User.FindFirstValue("id");
             await _boardService.UpdateBoard(boardId, request, userId);
@@ -90,7 +90,7 @@ namespace TaskManagement.Controllers
         [HttpPost]
         [Authorize]
         [Route("{boardId}/columns")]
-        public async Task<IActionResult> AddColumn(string boardId, ColumnAddRequestModel request)
+        public async Task<IActionResult> AddColumn(string boardId, ColumnAddRequest request)
         {
             var column = await _columnService.AddColumn(request, boardId);
             return Ok(column);
@@ -99,7 +99,7 @@ namespace TaskManagement.Controllers
         [HttpPost]
         [Authorize]
         [Route("{boardId}/labels")]
-        public async Task<IActionResult> AddLabel(string boardId, LabelAddRequestModel request)
+        public async Task<IActionResult> AddLabel(string boardId, LabelAddRequest request)
         {
             var label = await _labelService.AddLabel(boardId, request);
             return Ok(label);

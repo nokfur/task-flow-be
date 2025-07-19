@@ -25,44 +25,44 @@ namespace Services.BoardServices
             _mapper = mapper;
         }
 
-        public async Task<ICollection<BoardResponseModel>> GetBoardsByUserId(string? userId)
+        public async Task<ICollection<BoardPreviewResponse>> GetBoardsByUserId(string? userId)
         {
             var boards = await _unitOfWork.Boards.GetAsync(b => b.OwnerId.Equals(userId) ||
                 b.Members.Any(m => m.Id.Equals(userId)),
                 "Members, Labels, Columns, Columns.Tasks, Columns.Tasks.Labels");
 
-            var response = _mapper.Map<ICollection<BoardResponseModel>>(boards, opt => { opt.Items["UserId"] = userId; });
+            var response = _mapper.Map<ICollection<BoardPreviewResponse>>(boards, opt => { opt.Items["UserId"] = userId; });
 
             return response;
         }
 
-        public async Task<BoardDetailResponseModel> GetBoardDetailById(string id, string? userId)
+        public async Task<BoardDetailResponse> GetBoardDetailById(string id, string? userId)
         {
             var board = await _unitOfWork.Boards.SingleOrDefaultAsync(b => b.Id.Equals(id), 
                 "Members, Labels, Columns, Columns.Tasks, Columns.Tasks.Labels");
 
             if (board == null) throw new CustomException("Board Id not found");
-            if (!board.IsTemplate && (!board.OwnerId.Equals(userId) || !board.Members.Any(m => m.Id.Equals(userId)))) 
+            if (!board.IsTemplate && !board.OwnerId.Equals(userId) && !board.Members.Any(m => m.Id.Equals(userId))) 
                 throw new CustomException("You are not permit to access this board", 403);
 
-            return _mapper.Map<BoardDetailResponseModel>(board);
+            return _mapper.Map<BoardDetailResponse>(board);
         }
 
-        public async Task<ICollection<BoardResponseModel>> GetBoardTemplates()
+        public async Task<ICollection<BoardPreviewResponse>> GetBoardTemplatesPreview()
         {
             var boards = await _unitOfWork.Boards.GetAsync(b => b.IsTemplate, 
                 "Labels, Columns, Columns.Tasks, Columns.Tasks.Labels");
-            return _mapper.Map<ICollection<BoardResponseModel>>(boards);
+            return _mapper.Map<ICollection<BoardPreviewResponse>>(boards);
         }
 
-        public async Task<ICollection<BoardTemplateResponseModel>> GetBoardTemplatesForSetup()
+        public async Task<ICollection<BoardTemplateResponse>> GetBoardTemplatesForSetup()
         {
             var boards = await _unitOfWork.Boards.GetAsync(b => b.IsTemplate,
                 "Columns");
-            return _mapper.Map<ICollection<BoardTemplateResponseModel>>(boards);
+            return _mapper.Map<ICollection<BoardTemplateResponse>>(boards);
         }        
 
-        public async Task AddBoardTemplate(BoardTemplateAddRequestModel request, string? userId)
+        public async Task AddBoardTemplate(BoardTemplateAddRequest request, string? userId)
         {
             var currentUser = await _unitOfWork.Users.SingleOrDefaultAsync(x => x.Id.Equals(userId));
             if (currentUser == null) throw new CustomException("User not exist");
@@ -157,7 +157,7 @@ namespace Services.BoardServices
             }
         }
 
-        public async Task AddBoard(BoardAddRequestModel request, string? userId)
+        public async Task AddBoard(BoardAddRequest request, string? userId)
         {
             var currentUser = await _unitOfWork.Users.SingleOrDefaultAsync(x => x.Id.Equals(userId));
             if (currentUser == null) throw new CustomException("User not exist");
@@ -180,7 +180,7 @@ namespace Services.BoardServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdateBoard(string boardId, BoardUpdateRequestModel request, string? userId)
+        public async Task UpdateBoard(string boardId, BoardUpdateRequest request, string? userId)
         {
             var board = await _unitOfWork.Boards.SingleOrDefaultAsync(b => b.Id.Equals(boardId));
             var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));

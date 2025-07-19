@@ -5,17 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObjects.DTOs.Label.Request
+namespace BusinessObjects.DTOs.User.Request
 {
-    public class LabelTemplateAddRequestModel
+    public class BoardMemberAddRequest
     {
         [Required]
-        public string Id { get; set; } = null!;
+        public string BoardId { get; set; } = null!;
 
         [Required]
-        public string Name { get; set; } = null!;
+        public string MemberId { get; set; } = null!;
 
         [Required]
-        public string Color { get; set; } = null!;
+        public string Role { get; set; } = null!;
     }
 }

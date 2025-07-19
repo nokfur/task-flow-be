@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.WorkTask.Request
 {
-    public class TaskUpdateRequestModel
+    public class TaskUpdateRequest
     {
         [Required]
         public string Title { get; set; } = null!;

@@ -10,8 +10,8 @@ namespace Services.LabelServices
 {
     public interface ILabelService
     {
-        Task<LabelDetailResponseModel> AddLabel(string boardId, LabelAddRequestModel request);
-        Task UpdateLabel(string labelId, LabelUpdateRequestModel request);
+        Task<LabelDetailResponse> AddLabel(string boardId, LabelAddRequest request);
+        Task UpdateLabel(string labelId, LabelUpdateRequest request);
         Task DeleteLabel(string labelId);
     }
 }

@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObjects.DTOs.User.Request
+namespace BusinessObjects.DTOs.Label.Request
 {
-    public class UserLoginRequestModel
+    public class LabelUpdateRequest
     {
         [Required]
-        public string Email { get; set; } = null!;
+        public string Name { get; set; } = null!;
 
         [Required]
-        public string Password { get; set; } = null!;
+        public string Color { get; set; } = null!;
     }
 }

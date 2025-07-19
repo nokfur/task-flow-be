@@ -28,13 +28,13 @@ namespace TaskManagement.Controllers
         [Route("templates")]
         public async Task<IActionResult> GetBoardTemplates()
         {
-            var response = await _boardService.GetBoardTemplates();
+            var response = await _boardService.GetBoardTemplatesPreview();
             return Ok(response);
         }
 
         [HttpPost]
         [Route("templates")]
-        public async Task<IActionResult> AddBoardTemplate(BoardTemplateAddRequestModel request)
+        public async Task<IActionResult> AddBoardTemplate(BoardTemplateAddRequest request)
         {
             var userId = HttpContext.User.FindFirstValue("id");
             await _boardService.AddBoardTemplate(request, userId);

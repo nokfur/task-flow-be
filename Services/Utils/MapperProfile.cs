@@ -23,15 +23,15 @@ namespace Services.Utils
         public MapperProfile() 
         {
             // ============================================ User ============================================
-            CreateMap<User, UserProfileResponseModel>();
+            CreateMap<User, UserProfileResponse>();
 
-            CreateMap<User, UserDetailResponseModel>();
+            CreateMap<User, UserDetailResponse>();
 
-            CreateMap<UserRegisterRequestModel, User>()
+            CreateMap<UserRegisterRequest, User>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
 
             // ============================================ Board Member ============================================
-            CreateMap<MemberAddRequestModal, BoardMember>()
+            CreateMap<MemberAddRequest, BoardMember>()
                 .ForMember(dest => dest.BoardId, opt => opt.MapFrom((src, _, _, context) => context.Items["BoardId"]));
 
             // ============================================ Board ============================================
@@ -41,7 +41,7 @@ namespace Services.Utils
                 .ForMember(dest => dest.Labels, opt => opt.Ignore())
                 .ForMember(dest => dest.BoardMembers, opt => opt.Ignore());
 
-            CreateMap<Board, BoardResponseModel>()
+            CreateMap<Board, BoardPreviewResponse>()
                 .ForMember(dest => dest.ColumnCount, opt => opt.MapFrom(src => src.Columns.Count()))
                 .ForMember(dest => dest.TaskCount, opt => opt.MapFrom(src => src.Columns.SelectMany(c => c.Tasks).Count()))
                 .ForMember(dest => dest.LabelCount, opt => opt.MapFrom(src => src.Labels.Count()))
@@ -51,26 +51,26 @@ namespace Services.Utils
                     return src.OwnerId.Equals(userId);
                 }));
             
-            CreateMap<Board, BoardDetailResponseModel>()
+            CreateMap<Board, BoardDetailResponse>()
                 .ForMember(dest => dest.Columns, opt => opt.MapFrom(src => src.Columns.OrderBy(c => c.Position)))
                 .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => src.Labels.OrderBy(l => l.Name)));
 
-            CreateMap<Board, BoardTemplateResponseModel>()
+            CreateMap<Board, BoardTemplateResponse>()
                 .ForMember(dest => dest.Columns, opt => opt.MapFrom(src => src.Columns.OrderBy(c => c.Position).Select(c => c.Title)));
 
-            CreateMap<BoardTemplateAddRequestModel, Board>()
+            CreateMap<BoardTemplateAddRequest, Board>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.IsTemplate, opt => opt.MapFrom(_ => true));
 
-            CreateMap<BoardAddRequestModel, Board>()
+            CreateMap<BoardAddRequest, Board>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.BoardMembers, opt => opt.Ignore());
 
-            CreateMap<BoardUpdateRequestModel, Board>()
+            CreateMap<BoardUpdateRequest, Board>()
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
 
             // ============================================ Column ============================================
@@ -78,16 +78,16 @@ namespace Services.Utils
                 .ForMember(dest => dest.Board, opt => opt.Ignore())
                 .ForMember(dest => dest.Tasks, opt => opt.Ignore());
 
-            CreateMap<Column, ColumnDetailResponseModel>()
+            CreateMap<Column, ColumnDetailResponse>()
                 .ForMember(dest => dest.Tasks, opt => opt.MapFrom(src => src.Tasks.OrderBy(t => t.Position))); ;
             
-            CreateMap<ColumnTemplateAddRequestModel, Column>()
+            CreateMap<ColumnTemplateAddRequest, Column>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
 
-            CreateMap<ColumnAddRequestModel, Column>()
+            CreateMap<ColumnAddRequest, Column>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
             
-            CreateMap<ColumnUpdateRequestModel, Column>();
+            CreateMap<ColumnUpdateRequest, Column>();
 
             // ============================================ Task ============================================
             CreateMap<WorkTask, WorkTask>()
@@ -95,20 +95,20 @@ namespace Services.Utils
                 .ForMember(dest => dest.TaskLabels, opt => opt.Ignore())
                 .ForMember(dest => dest.Labels, opt => opt.Ignore());
 
-            CreateMap<WorkTask, TaskDetailResponseModel>()
+            CreateMap<WorkTask, TaskDetailResponse>()
                 .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => src.TaskLabels.Select(tl => tl.Label).OrderBy(l => l.Name)));
             
-            CreateMap<TaskTemplateAddRequestModel, WorkTask>()
+            CreateMap<TaskTemplateAddRequest, WorkTask>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
 
-            CreateMap<TaskAddRequestModel, WorkTask>()
+            CreateMap<TaskAddRequest, WorkTask>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
             
-            CreateMap<TaskUpdateRequestModel, WorkTask>()
+            CreateMap<TaskUpdateRequest, WorkTask>()
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
 
             // ============================================ Label ============================================
@@ -116,15 +116,15 @@ namespace Services.Utils
                 .ForMember(dest => dest.TaskLabels, opt => opt.Ignore())
                 .ForMember(dest => dest.Tasks, opt => opt.Ignore());
 
-            CreateMap<Label, LabelDetailResponseModel>();
+            CreateMap<Label, LabelDetailResponse>();
 
-            CreateMap<LabelTemplateAddRequestModel, Label>()
+            CreateMap<LabelTemplateAddRequest, Label>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             
-            CreateMap<LabelAddRequestModel, Label>()
+            CreateMap<LabelAddRequest, Label>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
             
-            CreateMap<LabelUpdateRequestModel, Label>();
+            CreateMap<LabelUpdateRequest, Label>();
         }
     }
 }

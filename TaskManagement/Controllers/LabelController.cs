@@ -20,7 +20,7 @@ namespace TaskManagement.Controllers
         [Authorize]
         [HttpPut]
         [Route("{labelId}")]
-        public async Task<IActionResult> UpdateLabel(string labelId, LabelUpdateRequestModel request)
+        public async Task<IActionResult> UpdateLabel(string labelId, LabelUpdateRequest request)
         {
             await _labelService.UpdateLabel(labelId, request);
             return Ok();

@@ -5,11 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObjects.DTOs.Column.Request
+namespace BusinessObjects.DTOs.Label.Request
 {
-    public class ColumnAddRequestModel
+    public class LabelAddRequest
     {
         [Required]
-        public string Title { get; set; } = null!;
+        public string Name { get; set; } = null!;
+
+        [Required]
+        public string Color { get; set; } = null!;
     }
 }

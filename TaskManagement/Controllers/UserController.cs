@@ -34,7 +34,7 @@ namespace TaskManagement.Controllers
         [Authorize]
         public async Task<IActionResult> SearchUser(string? search, [FromBody] List<string> exeptIds)
         {
-            if (string.IsNullOrEmpty(search)) return Ok(new List<UserProfileResponseModel>());
+            if (string.IsNullOrEmpty(search)) return Ok(new List<UserProfileResponse>());
 
             var response = await _userService.SearchUser(search, exeptIds);
             return Ok(response);
@@ -43,7 +43,7 @@ namespace TaskManagement.Controllers
         [HttpPatch]
         [Authorize]
         [Route("password")]
-        public async Task<IActionResult> ChangePassword(UserChangePasswordRequestModel request)
+        public async Task<IActionResult> ChangePassword(UserChangePasswordRequest request)
         {
             string? userId = HttpContext.User.FindFirstValue("id");
             await _userService.ChangePassword(request, userId);

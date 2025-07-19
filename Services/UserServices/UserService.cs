@@ -62,7 +62,7 @@ namespace Services.UserServices
             return accessToken;
         }
 
-        public async Task<UserLoginResponseModel> Login(UserLoginRequestModel request)
+        public async Task<UserLoginResponse> Login(UserLoginRequest request)
         {
             var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Email.Equals(request.Email));
 
@@ -71,13 +71,13 @@ namespace Services.UserServices
             bool isPasswordValid = PasswordHasher.VerifyPassword(request.Password, user.Password, user.Salt);
             if (!isPasswordValid) throw new CustomException("Password incorrect");
 
-            return new UserLoginResponseModel()
+            return new UserLoginResponse()
             {
                 Token = GenerateJWT(user)
             };
         }
 
-        public async Task Register(UserRegisterRequestModel request)
+        public async Task Register(UserRegisterRequest request)
         {
             if (await _unitOfWork.Users.IsExistAsync(u => u.Email.Equals(request.Email)))
                 throw new CustomException("This email has been used");
@@ -95,21 +95,21 @@ namespace Services.UserServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<UserProfileResponseModel> GetUserProfile(string? userId)
+        public async Task<UserProfileResponse> GetUserProfile(string? userId)
         {
             var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));
             if (user == null) throw new CustomException("User Id not exist");
 
-            return _mapper.Map<UserProfileResponseModel>(user);
+            return _mapper.Map<UserProfileResponse>(user);
         }
 
-        public async Task<ICollection<UserProfileResponseModel>> SearchUser(string search, List<string> exceptIds)
+        public async Task<ICollection<UserProfileResponse>> SearchUser(string search, List<string> exceptIds)
         {
             var users = await _unitOfWork.Users.GetAsync(u => 
                 (u.Name.ToLower().Contains(search.ToLower()) || u.Email.ToLower().Contains(search.ToLower()))
                 && !exceptIds.Contains(u.Id));
 
-            return _mapper.Map<ICollection<UserProfileResponseModel>>(users);
+            return _mapper.Map<ICollection<UserProfileResponse>>(users);
         }
 
         public async Task AddMemberToBoard(string boardId, ICollection<string> emails)
@@ -154,7 +154,7 @@ namespace Services.UserServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task ChangePassword(UserChangePasswordRequestModel request, string? userId)
+        public async Task ChangePassword(UserChangePasswordRequest request, string? userId)
         {
             var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));
 
@@ -170,11 +170,11 @@ namespace Services.UserServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<ICollection<UserDetailResponseModel>> GetAllUsers()
+        public async Task<ICollection<UserDetailResponse>> GetAllUsers()
         {
             var users = await _unitOfWork.Users.GetAllAsync();
 
-            return _mapper.Map<ICollection<UserDetailResponseModel>>(users);
+            return _mapper.Map<ICollection<UserDetailResponse>>(users);
         }
     }
 }

@@ -11,14 +11,14 @@ namespace Services.BoardServices
 {
     public interface IBoardService
     {
-        Task<ICollection<BoardResponseModel>> GetBoardsByUserId(string? userId);
-        Task<BoardDetailResponseModel> GetBoardDetailById(string id, string? userId);
-        Task<ICollection<BoardResponseModel>> GetBoardTemplates();
-        Task<ICollection<BoardTemplateResponseModel>> GetBoardTemplatesForSetup();
-        Task AddBoardTemplate(BoardTemplateAddRequestModel request, string? userId);
+        Task<ICollection<BoardPreviewResponse>> GetBoardsByUserId(string? userId);
+        Task<BoardDetailResponse> GetBoardDetailById(string id, string? userId);
+        Task<ICollection<BoardPreviewResponse>> GetBoardTemplatesPreview();
+        Task<ICollection<BoardTemplateResponse>> GetBoardTemplatesForSetup();
+        Task AddBoardTemplate(BoardTemplateAddRequest request, string? userId);
 
-        Task AddBoard(BoardAddRequestModel request, string? userId);
-        Task UpdateBoard(string boardId, BoardUpdateRequestModel request, string? userId);
+        Task AddBoard(BoardAddRequest request, string? userId);
+        Task UpdateBoard(string boardId, BoardUpdateRequest request, string? userId);
         Task DeleteBoard(string boardId, string? userId);
     }
 }

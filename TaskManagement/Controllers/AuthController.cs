@@ -18,7 +18,7 @@ namespace TaskManagement.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register(UserRegisterRequestModel request)
+        public async Task<IActionResult> Register(UserRegisterRequest request)
         {
             await _userService.Register(request);
             return Ok();
@@ -26,7 +26,7 @@ namespace TaskManagement.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login(UserLoginRequestModel request)
+        public async Task<IActionResult> Login(UserLoginRequest request)
         {
             var response = await _userService.Login(request);
             return Ok(response);

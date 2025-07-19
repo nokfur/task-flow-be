@@ -9,15 +9,15 @@ using BusinessObjects.DTOs.Label.Request;
 
 namespace BusinessObjects.DTOs.Board.Request
 {
-    public class BoardTemplateAddRequestModel
+    public class BoardTemplateAddRequest
     {
         [Required]
         public string Title { get; set; } = null!;
 
         public string? Description { get; set; }
 
-        public ICollection<ColumnTemplateAddRequestModel> Columns { get; set; } = new List<ColumnTemplateAddRequestModel>();
+        public ICollection<ColumnTemplateAddRequest> Columns { get; set; } = new List<ColumnTemplateAddRequest>();
 
-        public ICollection<LabelTemplateAddRequestModel> Labels { get; set; } = new List<LabelTemplateAddRequestModel>();
+        public ICollection<LabelTemplateAddRequest> Labels { get; set; } = new List<LabelTemplateAddRequest>();
     }
 }
