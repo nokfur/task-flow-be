@@ -31,9 +31,9 @@ namespace Services.TaskServices
             if (!await _unitOfWork.Columns.IsExistAsync(c => c.Id.Equals(columnId)))
                 throw new CustomException("Column Id not found");
 
-            var existingTitles = (await _unitOfWork.Tasks.GetAsync(t => t.ColumnId.Equals(columnId) && t.Title.StartsWith(request.Title)))
-                    .Select(t => t.Title).ToHashSet();
-            request.Title = Util.GenerateUniqueTitle(request.Title, existingTitles);
+            //var existingTitles = (await _unitOfWork.Tasks.GetAsync(t => t.ColumnId.Equals(columnId) && t.Title.StartsWith(request.Title)))
+            //        .Select(t => t.Title).ToHashSet();
+            //request.Title = Util.GenerateUniqueTitle(request.Title, existingTitles);
 
             var tasks = await _unitOfWork.Tasks.GetAsync(t => t.ColumnId.Equals(columnId));
             int lastPostion = tasks.Count() - 1;
@@ -53,8 +53,8 @@ namespace Services.TaskServices
             var task = await _unitOfWork.Tasks.SingleOrDefaultAsync(c => c.Id.Equals(taskId));
 
             if (task == null) throw new CustomException("Task Id not found");
-            if (await _unitOfWork.Tasks.IsExistAsync(x => x.ColumnId.Equals(task.ColumnId) && x.Title.Equals(request.Title) && !x.Id.Equals(taskId)))
-                throw new CustomException("Task name has existed in this Column");
+            //if (await _unitOfWork.Tasks.IsExistAsync(x => x.ColumnId.Equals(task.ColumnId) && x.Title.Equals(request.Title) && !x.Id.Equals(taskId)))
+            //    throw new CustomException("Task name has existed in this Column");
 
             _mapper.Map(request, task);
 
