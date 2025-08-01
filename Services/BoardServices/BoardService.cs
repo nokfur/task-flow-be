@@ -8,6 +8,7 @@ using BusinessObjects;
 using BusinessObjects.Constants;
 using BusinessObjects.DTOs.Board.Request;
 using BusinessObjects.DTOs.Board.Response;
+using BusinessObjects.DTOs.User.Response;
 using BusinessObjects.Models;
 using Microsoft.AspNetCore.Http;
 using Repositories.Repositories;
@@ -43,9 +44,14 @@ namespace Services.BoardServices
 
             if (board == null) throw new CustomException("Board Id not found");
             if (!board.IsTemplate && !board.OwnerId.Equals(userId) && !board.Members.Any(m => m.Id.Equals(userId))) 
-                throw new CustomException("You are not permit to access this board", 403);
+                throw new CustomException("You are not allowed to access this board", 403);
 
-            return _mapper.Map<BoardDetailResponse>(board);
+            var currentBoardMember = await _unitOfWork.BoardMembers
+                .SingleOrDefaultAsync(x => x.BoardId.Equals(id) && x.MemberId.Equals(userId));
+            var response = _mapper.Map<BoardDetailResponse>(board);
+            response.UserRole = currentBoardMember.Role;
+
+            return response;
         }
 
         public async Task<ICollection<BoardPreviewResponse>> GetBoardTemplatesPreview()
@@ -104,7 +110,7 @@ namespace Services.BoardServices
 
             await _unitOfWork.Boards.AddAsync(newBoard);
             await _unitOfWork.SaveChangesAsync();
-        }
+        }        
 
         private async Task CloneBoardFromTemplate(string templateId, Board board)
         {

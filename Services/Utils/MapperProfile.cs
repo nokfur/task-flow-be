@@ -32,7 +32,12 @@ namespace Services.Utils
 
             // ============================================ Board Member ============================================
             CreateMap<MemberAddRequest, BoardMember>()
-                .ForMember(dest => dest.BoardId, opt => opt.MapFrom((src, _, _, context) => context.Items["BoardId"]));
+                .ForMember(dest => dest.BoardId, opt => opt.MapFrom((src, _, _, context) => context.TryGetItems(out var items) ? (string)items["BoardId"] : ""));
+
+            CreateMap<BoardMember, MemberResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.MemberId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Member.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Member.Email));
 
             // ============================================ Board ============================================
             CreateMap<Board, Board>()

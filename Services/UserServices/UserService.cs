@@ -105,52 +105,46 @@ namespace Services.UserServices
 
         public async Task<ICollection<UserProfileResponse>> SearchUser(string search, List<string> exceptIds)
         {
-            var users = await _unitOfWork.Users.GetAsync(u => 
+            var users = await _unitOfWork.Users.GetAsync(u =>
                 (u.Name.ToLower().Contains(search.ToLower()) || u.Email.ToLower().Contains(search.ToLower()))
                 && !exceptIds.Contains(u.Id));
 
             return _mapper.Map<ICollection<UserProfileResponse>>(users);
         }
 
-        public async Task AddMemberToBoard(string boardId, ICollection<string> emails)
+        public async Task<ICollection<MemberResponse>> GetBoardMembers(string boardId)
         {
-            var board = await _unitOfWork.Boards.SingleOrDefaultAsync(x => x.Id.Equals(boardId), "Members");
+            var boardMembers = await _unitOfWork.BoardMembers.GetAsync(b => b.BoardId.Equals(boardId), "Member");
+            return _mapper.Map<ICollection<MemberResponse>>(boardMembers);
+        }
 
-            if (board == null) throw new CustomException("Board Id not exist");
-
-            var existEmails = board.Members.Select(x => x.Email);
-            var membersToAdd = await _unitOfWork.Users.GetAsync(x => emails.Contains(x.Email) && !existEmails.Contains(x.Email));
-
-            var notFoundEmails = emails.Except(membersToAdd.Select(m => m.Email));
-            if (notFoundEmails.Any()) throw new CustomException("Email not found " + String.Join(", ", notFoundEmails), StatusCodes.Status404NotFound);
-
-            foreach (var member in membersToAdd)
-            {
-                board.Members.Add(member);
-            }
-
-            _unitOfWork.Boards.Update(board);
+        public async Task AddMemberToBoard(string boardId, ICollection<MemberAddRequest> request)
+        {
+            var newBoardMembers = _mapper.Map<ICollection<BoardMember>>(request, opt => { opt.Items["BoardId"] = boardId; });
+            
+            await _unitOfWork.BoardMembers.AddRangeAsync(newBoardMembers);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task RemoveMemberFromBoard(string boardId, ICollection<string> emails)
+        public async Task RemoveMemberFromBoard(string boardId, string memberId)
         {
-            var board = await _unitOfWork.Boards.SingleOrDefaultAsync(x => x.Id.Equals(boardId), "Members");
+            var boardMember = await _unitOfWork.BoardMembers
+                .SingleOrDefaultAsync(x => x.BoardId.Equals(boardId) && x.MemberId.Equals(memberId));
+            if (boardMember == null) throw new CustomException("Board or Member not found");
 
-            if (board == null) throw new CustomException("Board Id not exist");
+            _unitOfWork.BoardMembers.Delete(boardMember);
+            await _unitOfWork.SaveChangesAsync();
+        }
 
-            var existEmails = board.Members.Select(x => x.Email);
-            var membersToRemove = await _unitOfWork.Users.GetAsync(x => emails.Contains(x.Email) && existEmails.Contains(x.Email));
+        public async Task UpdateMemberRole(string boardId, string memberId, string role)
+        {
+            var boardMember = await _unitOfWork.BoardMembers
+                .SingleOrDefaultAsync(x => x.BoardId.Equals(boardId) && x.MemberId.Equals(memberId));
+            if (boardMember == null) throw new CustomException("Board or Member not found");
 
-            var notFoundEmails = emails.Except(membersToRemove.Select(m => m.Email));
-            if (notFoundEmails.Any()) throw new CustomException("Email not found " + String.Join(", ", notFoundEmails), StatusCodes.Status404NotFound);
+            boardMember.Role = role;
 
-            foreach (var member in membersToRemove)
-            {
-                board.Members.Remove(member);
-            }
-
-            _unitOfWork.Boards.Update(board);
+            _unitOfWork.BoardMembers.Update(boardMember);
             await _unitOfWork.SaveChangesAsync();
         }
 

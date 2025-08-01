@@ -14,8 +14,10 @@ namespace Services.UserServices
         Task Register(UserRegisterRequest request);
         Task<UserProfileResponse> GetUserProfile(string? userId);
         Task<ICollection<UserProfileResponse>> SearchUser(string search, List<string> exeptIds);
-        Task AddMemberToBoard(string boardId, ICollection<string> emails);
-        Task RemoveMemberFromBoard(string boardId, ICollection<string> emails);
+        Task<ICollection<MemberResponse>> GetBoardMembers(string boardId);
+        Task AddMemberToBoard(string boardId, ICollection<MemberAddRequest> request);
+        Task RemoveMemberFromBoard(string boardId, string memberId);
+        Task UpdateMemberRole(string boardId, string memberId, string role);
         Task ChangePassword(UserChangePasswordRequest request, string? userId);
         Task<ICollection<UserDetailResponse>> GetAllUsers();
     }

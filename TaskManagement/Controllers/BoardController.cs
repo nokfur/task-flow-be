@@ -3,6 +3,7 @@ using BusinessObjects.DTOs.Board.Request;
 using BusinessObjects.DTOs.Board.Response;
 using BusinessObjects.DTOs.Column.Request;
 using BusinessObjects.DTOs.Label.Request;
+using BusinessObjects.DTOs.User.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -56,7 +57,7 @@ namespace TaskManagement.Controllers
         {
             var response = await _boardService.GetBoardTemplatesForSetup();
             return Ok(response);
-        }        
+        }
 
         [HttpPost]
         [Authorize]
@@ -105,21 +106,39 @@ namespace TaskManagement.Controllers
             return Ok(label);
         }
 
-        [HttpPatch]
+        [HttpGet]
         [Authorize]
         [Route("{boardId}/members")]
-        public async Task<IActionResult> AddMemberToBoard(string boardId, [FromBody] ICollection<string> emails)
+        public async Task<IActionResult> GetBoardMembers(string boardId)
         {
-            await _userService.AddMemberToBoard(boardId, emails);
+            var members = await _userService.GetBoardMembers(boardId);
+            return Ok(members);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("{boardId}/members")]
+        public async Task<IActionResult> AddMemberToBoard(string boardId, ICollection<MemberAddRequest> request)
+        {
+            await _userService.AddMemberToBoard(boardId, request);
             return Ok();
         }
 
         [HttpDelete]
         [Authorize]
-        [Route("{boardId}/members")]
-        public async Task<IActionResult> RemoveMemberFromBoard(string boardId, [FromBody] ICollection<string> emails)
+        [Route("{boardId}/members/{memberId}")]
+        public async Task<IActionResult> RemoveMemberFromBoard(string boardId, string memberId)
         {
-            await _userService.RemoveMemberFromBoard(boardId, emails);
+            await _userService.RemoveMemberFromBoard(boardId, memberId);
+            return Ok();
+        }
+
+        [HttpPatch]
+        [Authorize]
+        [Route("{boardId}/members/{memberId}/role")]
+        public async Task<IActionResult> UpdateMemberRole(string boardId, string memberId, [FromBody] string role)
+        {
+            await _userService.UpdateMemberRole(boardId, memberId, role);
             return Ok();
         }
     }

@@ -21,6 +21,8 @@ namespace BusinessObjects.DTOs.Board.Response
 
         public DateTime UpdatedAt { get; set; }
 
+        public string UserRole { get; set; } = null!;
+
         public ICollection<ColumnDetailResponse> Columns { get; set; } = new List<ColumnDetailResponse>();
 
         public ICollection<LabelDetailResponse> Labels { get; set; } = new List<LabelDetailResponse>();
