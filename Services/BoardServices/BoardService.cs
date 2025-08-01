@@ -188,23 +188,38 @@ namespace Services.BoardServices
 
         public async Task UpdateBoard(string boardId, BoardUpdateRequest request, string? userId)
         {
-            var board = await _unitOfWork.Boards.SingleOrDefaultAsync(b => b.Id.Equals(boardId));
-            var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));
+            var board = await _unitOfWork.Boards.SingleOrDefaultAsync(b => b.Id == boardId);
+            var boardMember = await _unitOfWork.BoardMembers
+                .SingleOrDefaultAsync(bm => bm.BoardId == boardId && bm.MemberId == userId, "Member");
 
-            if (board == null) throw new CustomException("Board not found", 404);
-            if (user == null) throw new CustomException("User not found", 404);
+            if (board == null)
+                throw new CustomException("Board not found", StatusCodes.Status404NotFound);
 
-            if ((board.IsTemplate && !user.Role.Equals(UserRoles.Admin)) || 
-                !board.OwnerId.Equals(userId)) 
+            if (boardMember == null)
+                throw new CustomException("You are not a member of this board", StatusCodes.Status403Forbidden);
+
+            // Permission check
+            var isNotAdmin = boardMember.Member?.Role != UserRoles.Admin;
+            var isJustMember = boardMember.Role == BoardMemberRole.Member;
+
+            if ((board.IsTemplate && isNotAdmin) || (!board.IsTemplate && isJustMember))
                 throw new CustomException("You are not allowed to perform this action", StatusCodes.Status403Forbidden);
-            
-            if (await _unitOfWork.Boards.IsExistAsync(b => !b.Id.Equals(boardId) && b.Title.Equals(request.Title) && (b.IsTemplate || b.OwnerId.Equals(userId))))
-                throw new CustomException("You have already had a Board with this name");
 
+            // Title uniqueness check
+            bool titleConflict = await _unitOfWork.Boards.IsExistAsync(b =>
+                b.Id != boardId &&
+                b.Title == request.Title &&
+                (board.IsTemplate ? b.IsTemplate : b.OwnerId == board.OwnerId)
+            );
+
+            if (titleConflict)
+                throw new CustomException("You already have a board with this name");
+
+            // Update and save
             _mapper.Map(request, board);
-
             _unitOfWork.Boards.Update(board);
             await _unitOfWork.SaveChangesAsync();
+
         }
 
         public async Task DeleteBoard(string boardId, string? userId)
