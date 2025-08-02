@@ -48,6 +48,8 @@ namespace Services.BoardServices
 
             var currentBoardMember = await _unitOfWork.BoardMembers
                 .SingleOrDefaultAsync(x => x.BoardId.Equals(id) && x.MemberId.Equals(userId));
+            if (currentBoardMember == null) throw new CustomException("You are not a member of this board");
+
             var response = _mapper.Map<BoardDetailResponse>(board);
             response.UserRole = currentBoardMember.Role;
 
