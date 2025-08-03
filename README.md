@@ -240,5 +240,3 @@ dotnet publish -c Release -o ./publish
 - Monitor memory usage
 - Review N+1 query problems
 ---
-
-Built with ❤️ by the TaskFlow Team
