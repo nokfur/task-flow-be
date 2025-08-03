@@ -30,6 +30,8 @@ namespace Services.Utils
             CreateMap<UserRegisterRequest, User>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
 
+            CreateMap<UserProfileUpdateRequest, User>();
+
             // ============================================ Board Member ============================================
             CreateMap<MemberAddRequest, BoardMember>()
                 .ForMember(dest => dest.BoardId, opt => opt.MapFrom((src, _, _, context) => context.TryGetItems(out var items) ? (string)items["BoardId"] : ""));

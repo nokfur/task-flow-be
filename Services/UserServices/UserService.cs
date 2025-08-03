@@ -98,9 +98,24 @@ namespace Services.UserServices
         public async Task<UserProfileResponse> GetUserProfile(string? userId)
         {
             var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));
-            if (user == null) throw new CustomException("User Id not exist");
+            if (user == null) throw new CustomException("User not found");
 
             return _mapper.Map<UserProfileResponse>(user);
+        }
+
+        public async Task<UserLoginResponse> UpdateUserProfile(string? userId, UserProfileUpdateRequest request)
+        {
+            var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));
+            if (user == null) throw new CustomException("User not found");
+
+            _mapper.Map(request, user);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return new UserLoginResponse()
+            {
+                Token = GenerateJWT(user)
+            };
         }
 
         public async Task<ICollection<UserProfileResponse>> SearchUser(string search, List<string> exceptIds)

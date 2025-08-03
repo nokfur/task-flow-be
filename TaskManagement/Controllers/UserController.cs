@@ -30,6 +30,16 @@ namespace TaskManagement.Controllers
             return Ok(user);
         }
 
+        [HttpPut]
+        [Route("me")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile(UserProfileUpdateRequest request)
+        {
+            string? currentUserId = HttpContext.User.FindFirstValue("id");
+            var response = await _userService.UpdateUserProfile(currentUserId, request);
+            return Ok(response);
+        }
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> SearchUser(string? search, [FromBody] List<string> exeptIds)

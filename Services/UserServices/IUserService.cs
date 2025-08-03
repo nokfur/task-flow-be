@@ -13,6 +13,7 @@ namespace Services.UserServices
         Task<UserLoginResponse> Login(UserLoginRequest request);
         Task Register(UserRegisterRequest request);
         Task<UserProfileResponse> GetUserProfile(string? userId);
+        Task<UserLoginResponse> UpdateUserProfile(string? userId, UserProfileUpdateRequest request);
         Task<ICollection<UserProfileResponse>> SearchUser(string search, List<string> exeptIds);
         Task<ICollection<MemberResponse>> GetBoardMembers(string boardId);
         Task AddMemberToBoard(string boardId, ICollection<MemberAddRequest> request);
