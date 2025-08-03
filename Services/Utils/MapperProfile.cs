@@ -23,79 +23,115 @@ namespace Services.Utils
         public MapperProfile() 
         {
             // ============================================ User ============================================
-            CreateMap<User, UserProfileResponseModel>();
+            CreateMap<User, UserProfileResponse>();
 
-            CreateMap<UserRegisterRequestModel, User>()
+            CreateMap<User, UserDetailResponse>();
+
+            CreateMap<UserRegisterRequest, User>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
 
+            CreateMap<UserProfileUpdateRequest, User>();
+
             // ============================================ Board Member ============================================
-            CreateMap<MemberAddRequestModal, BoardMember>()
-                .ForMember(dest => dest.BoardId, opt => opt.MapFrom((src, _, _, context) => context.Items["BoardId"]));
+            CreateMap<MemberAddRequest, BoardMember>()
+                .ForMember(dest => dest.BoardId, opt => opt.MapFrom((src, _, _, context) => context.TryGetItems(out var items) ? (string)items["BoardId"] : ""));
+
+            CreateMap<BoardMember, MemberResponse>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.MemberId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Member.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Member.Email));
 
             // ============================================ Board ============================================
-            CreateMap<Board, BoardResponseModel>()
+            CreateMap<Board, Board>()
+                .ForMember(dest => dest.Members, opt => opt.Ignore())
+                .ForMember(dest => dest.Columns, opt => opt.Ignore())
+                .ForMember(dest => dest.Labels, opt => opt.Ignore())
+                .ForMember(dest => dest.BoardMembers, opt => opt.Ignore());
+
+            CreateMap<Board, BoardPreviewResponse>()
                 .ForMember(dest => dest.ColumnCount, opt => opt.MapFrom(src => src.Columns.Count()))
                 .ForMember(dest => dest.TaskCount, opt => opt.MapFrom(src => src.Columns.SelectMany(c => c.Tasks).Count()))
                 .ForMember(dest => dest.LabelCount, opt => opt.MapFrom(src => src.Labels.Count()))
-                .ForMember(dest => dest.isOwn, opt => opt.MapFrom((src, _, _, context) => src.OwnerId.Equals(context.Items["UserId"])));
+                .ForMember(dest => dest.isOwn, opt => opt.MapFrom((src, _, _, context) =>
+                {
+                    var userId = context.TryGetItems(out var items) ? (string)items["UserId"] : "";
+                    return src.OwnerId.Equals(userId);
+                }));
             
-            CreateMap<Board, BoardDetailResponseModel>()
+            CreateMap<Board, BoardDetailResponse>()
                 .ForMember(dest => dest.Columns, opt => opt.MapFrom(src => src.Columns.OrderBy(c => c.Position)))
                 .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => src.Labels.OrderBy(l => l.Name)));
 
-            CreateMap<BoardTemplateAddRequestModel, Board>()
+            CreateMap<Board, BoardTemplateResponse>()
+                .ForMember(dest => dest.Columns, opt => opt.MapFrom(src => src.Columns.OrderBy(c => c.Position).Select(c => c.Title)));
+
+            CreateMap<BoardTemplateAddRequest, Board>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.IsTemplate, opt => opt.MapFrom(_ => true));
 
-            CreateMap<BoardAddRequestModel, Board>()
+            CreateMap<BoardAddRequest, Board>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now))
+                .ForMember(dest => dest.BoardMembers, opt => opt.Ignore());
 
-            CreateMap<BoardUpdateRequestModel, Board>()
+            CreateMap<BoardUpdateRequest, Board>()
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
 
             // ============================================ Column ============================================
-            CreateMap<Column, ColumnDetailResponseModel>()
+            CreateMap<Column, Column>()
+                .ForMember(dest => dest.Board, opt => opt.Ignore())
+                .ForMember(dest => dest.Tasks, opt => opt.Ignore());
+
+            CreateMap<Column, ColumnDetailResponse>()
                 .ForMember(dest => dest.Tasks, opt => opt.MapFrom(src => src.Tasks.OrderBy(t => t.Position))); ;
             
-            CreateMap<ColumnTemplateAddRequestModel, Column>()
+            CreateMap<ColumnTemplateAddRequest, Column>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
 
-            CreateMap<ColumnAddRequestModel, Column>()
+            CreateMap<ColumnAddRequest, Column>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
             
-            CreateMap<ColumnUpdateRequestModel, Column>();
+            CreateMap<ColumnUpdateRequest, Column>();
 
             // ============================================ Task ============================================
-            CreateMap<WorkTask, TaskDetailResponseModel>()
+            CreateMap<WorkTask, WorkTask>()
+                .ForMember(dest => dest.Column, opt => opt.Ignore())
+                .ForMember(dest => dest.TaskLabels, opt => opt.Ignore())
+                .ForMember(dest => dest.Labels, opt => opt.Ignore());
+
+            CreateMap<WorkTask, TaskDetailResponse>()
                 .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => src.TaskLabels.Select(tl => tl.Label).OrderBy(l => l.Name)));
             
-            CreateMap<TaskTemplateAddRequestModel, WorkTask>()
+            CreateMap<TaskTemplateAddRequest, WorkTask>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
 
-            CreateMap<TaskAddRequestModel, WorkTask>()
+            CreateMap<TaskAddRequest, WorkTask>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
             
-            CreateMap<TaskUpdateRequestModel, WorkTask>()
+            CreateMap<TaskUpdateRequest, WorkTask>()
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
 
             // ============================================ Label ============================================
-            CreateMap<Label, LabelDetailResponseModel>();
-            
-            CreateMap<LabelTemplateAddRequestModel, Label>()
+            CreateMap<Label, Label>()
+                .ForMember(dest => dest.TaskLabels, opt => opt.Ignore())
+                .ForMember(dest => dest.Tasks, opt => opt.Ignore());
+
+            CreateMap<Label, LabelDetailResponse>();
+
+            CreateMap<LabelTemplateAddRequest, Label>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             
-            CreateMap<LabelAddRequestModel, Label>()
+            CreateMap<LabelAddRequest, Label>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid().ToString()));
             
-            CreateMap<LabelUpdateRequestModel, Label>();
+            CreateMap<LabelUpdateRequest, Label>();
         }
     }
 }

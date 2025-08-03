@@ -25,14 +25,14 @@ namespace Services.ColumnServices
             _mapper = mapper;
         }
 
-        public async Task<ColumnDetailResponseModel> AddColumn(ColumnAddRequestModel request, string boardId)
+        public async Task<ColumnDetailResponse> AddColumn(ColumnAddRequest request, string boardId)
         {
             if (!await _unitOfWork.Boards.IsExistAsync(c => c.Id.Equals(boardId)))
                 throw new CustomException("Board Id not found");
 
-            var existingTitles = (await _unitOfWork.Columns.GetAsync(t => t.BoardId == boardId && t.Title.StartsWith(request.Title)))
-                    .Select(t => t.Title).ToHashSet();
-            request.Title = Util.GenerateUniqueTitle(request.Title, existingTitles);
+            //var existingTitles = (await _unitOfWork.Columns.GetAsync(t => t.BoardId == boardId && t.Title.StartsWith(request.Title)))
+            //        .Select(t => t.Title).ToHashSet();
+            //request.Title = Util.GenerateUniqueTitle(request.Title, existingTitles);
 
             var columns = await _unitOfWork.Columns.GetAsync(c => c.BoardId.Equals(boardId));
             int lastPostion = columns.Count() - 1;
@@ -44,16 +44,16 @@ namespace Services.ColumnServices
             await _unitOfWork.Columns.AddAsync(newColumn);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<ColumnDetailResponseModel>(newColumn);
+            return _mapper.Map<ColumnDetailResponse>(newColumn);
         }
 
-        public async Task UpdateColumn(string columnId, ColumnUpdateRequestModel request)
+        public async Task UpdateColumn(string columnId, ColumnUpdateRequest request)
         {
             var column = await _unitOfWork.Columns.SingleOrDefaultAsync(c => c.Id.Equals(columnId));
 
             if (column == null) throw new CustomException("Column Id not found");
-            if (await _unitOfWork.Columns.IsExistAsync(x => x.BoardId.Equals(column.BoardId) && x.Title.Equals(request.Title) && !x.Id.Equals(columnId)))
-                throw new CustomException("Column name has existed in this board");
+            //if (await _unitOfWork.Columns.IsExistAsync(x => x.BoardId.Equals(column.BoardId) && x.Title.Equals(request.Title) && !x.Id.Equals(columnId)))
+            //    throw new CustomException("Column name has existed in this board");
 
             _mapper.Map(request, column);
 
@@ -61,7 +61,7 @@ namespace Services.ColumnServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdateColumnPositions(List<ColumnPositionUpdateRequestModel> request)
+        public async Task UpdateColumnPositions(List<ColumnPositionUpdateRequest> request)
         {
             var requestIds = request.Select(c => c.Id).ToHashSet();
 

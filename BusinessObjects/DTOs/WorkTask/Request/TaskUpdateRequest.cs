@@ -4,11 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BusinessObjects.Models;
 
 namespace BusinessObjects.DTOs.WorkTask.Request
 {
-    public class TaskAddRequestModel
+    public class TaskUpdateRequest
     {
         [Required]
         public string Title { get; set; } = null!;

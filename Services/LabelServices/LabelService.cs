@@ -24,7 +24,7 @@ namespace Services.LabelServices
             _mapper = mapper;
         }
 
-        public async Task<LabelDetailResponseModel> AddLabel(string boardId, LabelAddRequestModel request)
+        public async Task<LabelDetailResponse> AddLabel(string boardId, LabelAddRequest request)
         {
             if (!await _unitOfWork.Boards.IsExistAsync(c => c.Id.Equals(boardId)))
                 throw new CustomException("Board Id not found");
@@ -37,10 +37,10 @@ namespace Services.LabelServices
             await _unitOfWork.Labels.AddAsync(newLabel);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<LabelDetailResponseModel>(newLabel);
+            return _mapper.Map<LabelDetailResponse>(newLabel);
         }
 
-        public async Task UpdateLabel(string labelId, LabelUpdateRequestModel request)
+        public async Task UpdateLabel(string labelId, LabelUpdateRequest request)
         {
             var label = await _unitOfWork.Labels.SingleOrDefaultAsync(c => c.Id.Equals(labelId));
 

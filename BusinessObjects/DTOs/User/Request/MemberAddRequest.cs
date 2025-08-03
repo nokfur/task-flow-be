@@ -7,15 +7,12 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.User.Request
 {
-    public class BoardMemberAddRequestModel
+    public class MemberAddRequest
     {
-        [Required]
-        public string BoardId { get; set; } = null!;
-
         [Required]
         public string MemberId { get; set; } = null!;
 
         [Required]
-        public string Role { get; set; } = null!;
+        public string Role {  get; set; } = null!;
     }
 }

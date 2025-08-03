@@ -11,9 +11,9 @@ namespace Services.ColumnServices
 {
     public interface IColumnService
     {
-        Task<ColumnDetailResponseModel> AddColumn(ColumnAddRequestModel request, string boardId);
-        Task UpdateColumn(string columnId, ColumnUpdateRequestModel request);
-        Task UpdateColumnPositions(List<ColumnPositionUpdateRequestModel> request);
+        Task<ColumnDetailResponse> AddColumn(ColumnAddRequest request, string boardId);
+        Task UpdateColumn(string columnId, ColumnUpdateRequest request);
+        Task UpdateColumnPositions(List<ColumnPositionUpdateRequest> request);
         Task DeleteColumn(string columnId);
     }
 }

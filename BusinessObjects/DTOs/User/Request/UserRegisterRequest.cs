@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.User.Request
 {
-    public class UserRegisterRequestModel
+    public class UserRegisterRequest
     {
         [Required]
         public string Name { get; set; } = null!;

@@ -10,11 +10,16 @@ namespace Services.UserServices
 {
     public interface IUserService
     {
-        Task<UserLoginResponseModel> Login(UserLoginRequestModel request);
-        Task Register(UserRegisterRequestModel request);
-        Task<UserProfileResponseModel> GetUserProfile(string? userId);
-        Task<ICollection<UserProfileResponseModel>> SearchUser(string search, List<string> exeptIds);
-        Task AddMemberToBoard(string boardId, ICollection<string> emails);
-        Task RemoveMemberFromBoard(string boardId, ICollection<string> emails);
+        Task<UserLoginResponse> Login(UserLoginRequest request);
+        Task Register(UserRegisterRequest request);
+        Task<UserProfileResponse> GetUserProfile(string? userId);
+        Task<UserLoginResponse> UpdateUserProfile(string? userId, UserProfileUpdateRequest request);
+        Task<ICollection<UserProfileResponse>> SearchUser(string search, List<string> exeptIds);
+        Task<ICollection<MemberResponse>> GetBoardMembers(string boardId);
+        Task AddMemberToBoard(string boardId, ICollection<MemberAddRequest> request);
+        Task RemoveMemberFromBoard(string boardId, string memberId);
+        Task UpdateMemberRole(string boardId, string memberId, string role);
+        Task ChangePassword(UserChangePasswordRequest request, string? userId);
+        Task<ICollection<UserDetailResponse>> GetAllUsers();
     }
 }

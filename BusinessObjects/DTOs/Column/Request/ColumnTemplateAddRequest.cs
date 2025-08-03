@@ -8,7 +8,7 @@ using BusinessObjects.DTOs.WorkTask.Request;
 
 namespace BusinessObjects.DTOs.Column.Request
 {
-    public class ColumnTemplateAddRequestModel
+    public class ColumnTemplateAddRequest
     {
         [Required]
         public string Id { get; set; } = null!;
@@ -19,6 +19,6 @@ namespace BusinessObjects.DTOs.Column.Request
         [Required]
         public int Position { get; set; }
 
-        public ICollection<TaskTemplateAddRequestModel> Tasks { get; set; } = new List<TaskTemplateAddRequestModel>();
+        public ICollection<TaskTemplateAddRequest> Tasks { get; set; } = new List<TaskTemplateAddRequest>();
     }
 }

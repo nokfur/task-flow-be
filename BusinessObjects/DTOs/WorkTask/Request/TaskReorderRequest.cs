@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.WorkTask.Request
 {
-    public class TaskReorderRequestModel
+    public class TaskReorderRequest
     {
         [Required]
         public string TaskId { get; set; } = null!;

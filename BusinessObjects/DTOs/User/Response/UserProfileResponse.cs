@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.User.Response
 {
-    public class UserProfileResponseModel
+    public class UserProfileResponse
     {
         public string Id { get; set; } = null!;
 

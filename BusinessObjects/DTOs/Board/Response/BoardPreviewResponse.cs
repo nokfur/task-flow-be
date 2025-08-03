@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BusinessObjects.DTOs.Column.Response;
-using BusinessObjects.DTOs.Label.Response;
 using BusinessObjects.DTOs.User.Response;
 
 namespace BusinessObjects.DTOs.Board.Response
 {
-    public class BoardDetailResponseModel
+    public class BoardPreviewResponse
     {
         public string Id { get; set; } = null!;
 
@@ -21,10 +19,14 @@ namespace BusinessObjects.DTOs.Board.Response
 
         public DateTime UpdatedAt { get; set; }
 
-        public ICollection<ColumnDetailResponseModel> Columns { get; set; } = new List<ColumnDetailResponseModel>();
+        public int ColumnCount { get; set; }
 
-        public ICollection<LabelDetailResponseModel> Labels { get; set; } = new List<LabelDetailResponseModel>();
+        public int TaskCount { get; set; }
 
-        public ICollection<UserProfileResponseModel> Members { get; set; } = new List<UserProfileResponseModel>();
+        public int LabelCount { get; set; }
+
+        public bool isOwn { get; set; }
+
+        public ICollection<UserProfileResponse> Members { get; set; } = new List<UserProfileResponse>();
     }
 }

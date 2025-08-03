@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObjects.DTOs.User.Response
+namespace BusinessObjects.DTOs.User.Request
 {
-    public class UserLoginResponseModel
+    public class UserProfileUpdateRequest
     {
-        public string Token { get; set; } = null!;
+        public string Name { get; set; } = null!;
     }
 }

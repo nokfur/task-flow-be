@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Azure.Core;
 using BusinessObjects;
 using BusinessObjects.Constants;
 using BusinessObjects.DTOs.User.Request;
@@ -61,7 +62,7 @@ namespace Services.UserServices
             return accessToken;
         }
 
-        public async Task<UserLoginResponseModel> Login(UserLoginRequestModel request)
+        public async Task<UserLoginResponse> Login(UserLoginRequest request)
         {
             var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Email.Equals(request.Email));
 
@@ -70,13 +71,13 @@ namespace Services.UserServices
             bool isPasswordValid = PasswordHasher.VerifyPassword(request.Password, user.Password, user.Salt);
             if (!isPasswordValid) throw new CustomException("Password incorrect");
 
-            return new UserLoginResponseModel()
+            return new UserLoginResponse()
             {
                 Token = GenerateJWT(user)
             };
         }
 
-        public async Task Register(UserRegisterRequestModel request)
+        public async Task Register(UserRegisterRequest request)
         {
             if (await _unitOfWork.Users.IsExistAsync(u => u.Email.Equals(request.Email)))
                 throw new CustomException("This email has been used");
@@ -88,69 +89,101 @@ namespace Services.UserServices
             newUser.Salt = salt;
 
             newUser.CreatedAt = DateTime.Now;
-            newUser.Role = UserRoleEnum.User.ToString();
+            newUser.Role = UserRoles.User;
 
             await _unitOfWork.Users.AddAsync(newUser);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<UserProfileResponseModel> GetUserProfile(string? userId)
+        public async Task<UserProfileResponse> GetUserProfile(string? userId)
         {
             var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));
-            if (user == null) throw new CustomException("User Id not exist");
+            if (user == null) throw new CustomException("User not found");
 
-            return _mapper.Map<UserProfileResponseModel>(user);
+            return _mapper.Map<UserProfileResponse>(user);
         }
 
-        public async Task<ICollection<UserProfileResponseModel>> SearchUser(string search, List<string> exceptIds)
+        public async Task<UserLoginResponse> UpdateUserProfile(string? userId, UserProfileUpdateRequest request)
         {
-            var users = await _unitOfWork.Users.GetAsync(u => 
+            var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));
+            if (user == null) throw new CustomException("User not found");
+
+            _mapper.Map(request, user);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return new UserLoginResponse()
+            {
+                Token = GenerateJWT(user)
+            };
+        }
+
+        public async Task<ICollection<UserProfileResponse>> SearchUser(string search, List<string> exceptIds)
+        {
+            var users = await _unitOfWork.Users.GetAsync(u =>
                 (u.Name.ToLower().Contains(search.ToLower()) || u.Email.ToLower().Contains(search.ToLower()))
                 && !exceptIds.Contains(u.Id));
 
-            return _mapper.Map<ICollection<UserProfileResponseModel>>(users);
+            return _mapper.Map<ICollection<UserProfileResponse>>(users);
         }
 
-        public async Task AddMemberToBoard(string boardId, ICollection<string> emails)
+        public async Task<ICollection<MemberResponse>> GetBoardMembers(string boardId)
         {
-            var board = await _unitOfWork.Boards.SingleOrDefaultAsync(x => x.Id.Equals(boardId), "Members");
+            var boardMembers = await _unitOfWork.BoardMembers.GetAsync(b => b.BoardId.Equals(boardId), "Member");
+            return _mapper.Map<ICollection<MemberResponse>>(boardMembers);
+        }
 
-            if (board == null) throw new CustomException("Board Id not exist");
-
-            var existEmails = board.Members.Select(x => x.Email);
-            var membersToAdd = await _unitOfWork.Users.GetAsync(x => emails.Contains(x.Email) && !existEmails.Contains(x.Email));
-
-            var notFoundEmails = emails.Except(membersToAdd.Select(m => m.Email));
-            if (notFoundEmails.Any()) throw new CustomException("Email not found " + String.Join(", ", notFoundEmails), StatusCodes.Status404NotFound);
-
-            foreach (var member in membersToAdd)
-            {
-                board.Members.Add(member);
-            }
-
-            _unitOfWork.Boards.Update(board);
+        public async Task AddMemberToBoard(string boardId, ICollection<MemberAddRequest> request)
+        {
+            var newBoardMembers = _mapper.Map<ICollection<BoardMember>>(request, opt => { opt.Items["BoardId"] = boardId; });
+            
+            await _unitOfWork.BoardMembers.AddRangeAsync(newBoardMembers);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task RemoveMemberFromBoard(string boardId, ICollection<string> emails)
+        public async Task RemoveMemberFromBoard(string boardId, string memberId)
         {
-            var board = await _unitOfWork.Boards.SingleOrDefaultAsync(x => x.Id.Equals(boardId), "Members");
+            var boardMember = await _unitOfWork.BoardMembers
+                .SingleOrDefaultAsync(x => x.BoardId.Equals(boardId) && x.MemberId.Equals(memberId));
+            if (boardMember == null) throw new CustomException("Board or Member not found");
 
-            if (board == null) throw new CustomException("Board Id not exist");
-
-            var existEmails = board.Members.Select(x => x.Email);
-            var membersToRemove = await _unitOfWork.Users.GetAsync(x => emails.Contains(x.Email) && existEmails.Contains(x.Email));
-
-            var notFoundEmails = emails.Except(membersToRemove.Select(m => m.Email));
-            if (notFoundEmails.Any()) throw new CustomException("Email not found " + String.Join(", ", notFoundEmails), StatusCodes.Status404NotFound);
-
-            foreach (var member in membersToRemove)
-            {
-                board.Members.Remove(member);
-            }
-
-            _unitOfWork.Boards.Update(board);
+            _unitOfWork.BoardMembers.Delete(boardMember);
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task UpdateMemberRole(string boardId, string memberId, string role)
+        {
+            var boardMember = await _unitOfWork.BoardMembers
+                .SingleOrDefaultAsync(x => x.BoardId.Equals(boardId) && x.MemberId.Equals(memberId));
+            if (boardMember == null) throw new CustomException("Board or Member not found");
+
+            boardMember.Role = role;
+
+            _unitOfWork.BoardMembers.Update(boardMember);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task ChangePassword(UserChangePasswordRequest request, string? userId)
+        {
+            var user = await _unitOfWork.Users.SingleOrDefaultAsync(u => u.Id.Equals(userId));
+
+            if (user == null) throw new CustomException("User not found");
+
+            bool isPasswordValid = PasswordHasher.VerifyPassword(request.OldPassword, user.Password, user.Salt);
+            if (!isPasswordValid) throw new CustomException("Old Password incorrect");
+
+            var (hashedPassword, newSalt) = PasswordHasher.HashNewPassword(request.NewPassword);
+            user.Password = hashedPassword;
+            user.Salt = newSalt;
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<ICollection<UserDetailResponse>> GetAllUsers()
+        {
+            var users = await _unitOfWork.Users.GetAllAsync();
+
+            return _mapper.Map<ICollection<UserDetailResponse>>(users);
         }
     }
 }

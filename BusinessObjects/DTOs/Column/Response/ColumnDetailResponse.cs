@@ -8,7 +8,7 @@ using BusinessObjects.Models;
 
 namespace BusinessObjects.DTOs.Column.Response
 {
-    public class ColumnDetailResponseModel
+    public class ColumnDetailResponse
     {
         public string Id { get; set; } = null!;
 
@@ -16,6 +16,6 @@ namespace BusinessObjects.DTOs.Column.Response
 
         public int Position { get; set; }
 
-        public ICollection<TaskDetailResponseModel> Tasks { get; set; } = new List<TaskDetailResponseModel>();
+        public ICollection<TaskDetailResponse> Tasks { get; set; } = new List<TaskDetailResponse>();
     }
 }

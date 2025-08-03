@@ -3,6 +3,7 @@ using BusinessObjects.DTOs.Board.Request;
 using BusinessObjects.DTOs.Board.Response;
 using BusinessObjects.DTOs.Column.Request;
 using BusinessObjects.DTOs.Label.Request;
+using BusinessObjects.DTOs.User.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -54,24 +55,13 @@ namespace TaskManagement.Controllers
         [Route("templates")]
         public async Task<IActionResult> GetBoardTemplates()
         {
-            var userId = HttpContext.User.FindFirstValue("id");
-            var response = await _boardService.GetBoardTemplates(userId);
+            var response = await _boardService.GetBoardTemplatesForSetup();
             return Ok(response);
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
-        [Route("templates")]
-        public async Task<IActionResult> AddBoardTemplate(BoardTemplateAddRequestModel request)
-        {
-            var userId = HttpContext.User.FindFirstValue("id");
-            await _boardService.AddBoardTemplate(request, userId);
-            return Ok();
-        }
-
-        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddBoard(BoardAddRequestModel request)
+        public async Task<IActionResult> AddBoard(BoardAddRequest request)
         {
             var userId = HttpContext.User.FindFirstValue("id");
             await _boardService.AddBoard(request, userId);
@@ -81,7 +71,7 @@ namespace TaskManagement.Controllers
         [HttpPut]
         [Authorize]
         [Route("{boardId}")]
-        public async Task<IActionResult> UpdateBoard(string boardId, BoardUpdateRequestModel request)
+        public async Task<IActionResult> UpdateBoard(string boardId, BoardUpdateRequest request)
         {
             var userId = HttpContext.User.FindFirstValue("id");
             await _boardService.UpdateBoard(boardId, request, userId);
@@ -101,7 +91,7 @@ namespace TaskManagement.Controllers
         [HttpPost]
         [Authorize]
         [Route("{boardId}/columns")]
-        public async Task<IActionResult> AddColumn(string boardId, ColumnAddRequestModel request)
+        public async Task<IActionResult> AddColumn(string boardId, ColumnAddRequest request)
         {
             var column = await _columnService.AddColumn(request, boardId);
             return Ok(column);
@@ -110,27 +100,45 @@ namespace TaskManagement.Controllers
         [HttpPost]
         [Authorize]
         [Route("{boardId}/labels")]
-        public async Task<IActionResult> AddLabel(string boardId, LabelAddRequestModel request)
+        public async Task<IActionResult> AddLabel(string boardId, LabelAddRequest request)
         {
             var label = await _labelService.AddLabel(boardId, request);
             return Ok(label);
         }
 
-        [HttpPatch]
+        [HttpGet]
         [Authorize]
         [Route("{boardId}/members")]
-        public async Task<IActionResult> AddMemberToBoard(string boardId, [FromBody] ICollection<string> emails)
+        public async Task<IActionResult> GetBoardMembers(string boardId)
         {
-            await _userService.AddMemberToBoard(boardId, emails);
+            var members = await _userService.GetBoardMembers(boardId);
+            return Ok(members);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("{boardId}/members")]
+        public async Task<IActionResult> AddMemberToBoard(string boardId, ICollection<MemberAddRequest> request)
+        {
+            await _userService.AddMemberToBoard(boardId, request);
             return Ok();
         }
 
         [HttpDelete]
         [Authorize]
-        [Route("{boardId}/members")]
-        public async Task<IActionResult> RemoveMemberFromBoard(string boardId, [FromBody] ICollection<string> emails)
+        [Route("{boardId}/members/{memberId}")]
+        public async Task<IActionResult> RemoveMemberFromBoard(string boardId, string memberId)
         {
-            await _userService.RemoveMemberFromBoard(boardId, emails);
+            await _userService.RemoveMemberFromBoard(boardId, memberId);
+            return Ok();
+        }
+
+        [HttpPatch]
+        [Authorize]
+        [Route("{boardId}/members/{memberId}/role")]
+        public async Task<IActionResult> UpdateMemberRole(string boardId, string memberId, [FromBody] string role)
+        {
+            await _userService.UpdateMemberRole(boardId, memberId, role);
             return Ok();
         }
     }

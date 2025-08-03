@@ -26,14 +26,14 @@ namespace Services.TaskServices
             _mapper = mapper;
         }
 
-        public async Task<TaskDetailResponseModel> AddTask(string columnId, TaskAddRequestModel request)
+        public async Task<TaskDetailResponse> AddTask(string columnId, TaskAddRequest request)
         {
             if (!await _unitOfWork.Columns.IsExistAsync(c => c.Id.Equals(columnId)))
                 throw new CustomException("Column Id not found");
 
-            var existingTitles = (await _unitOfWork.Tasks.GetAsync(t => t.ColumnId.Equals(columnId) && t.Title.StartsWith(request.Title)))
-                    .Select(t => t.Title).ToHashSet();
-            request.Title = Util.GenerateUniqueTitle(request.Title, existingTitles);
+            //var existingTitles = (await _unitOfWork.Tasks.GetAsync(t => t.ColumnId.Equals(columnId) && t.Title.StartsWith(request.Title)))
+            //        .Select(t => t.Title).ToHashSet();
+            //request.Title = Util.GenerateUniqueTitle(request.Title, existingTitles);
 
             var tasks = await _unitOfWork.Tasks.GetAsync(t => t.ColumnId.Equals(columnId));
             int lastPostion = tasks.Count() - 1;
@@ -45,16 +45,16 @@ namespace Services.TaskServices
             await _unitOfWork.Tasks.AddAsync(newTask);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<TaskDetailResponseModel>(newTask);
+            return _mapper.Map<TaskDetailResponse>(newTask);
         }
 
-        public async Task UpdateTask(string taskId, TaskUpdateRequestModel request)
+        public async Task UpdateTask(string taskId, TaskUpdateRequest request)
         {
             var task = await _unitOfWork.Tasks.SingleOrDefaultAsync(c => c.Id.Equals(taskId));
 
             if (task == null) throw new CustomException("Task Id not found");
-            if (await _unitOfWork.Tasks.IsExistAsync(x => x.ColumnId.Equals(task.ColumnId) && x.Title.Equals(request.Title) && !x.Id.Equals(taskId)))
-                throw new CustomException("Task name has existed in this Column");
+            //if (await _unitOfWork.Tasks.IsExistAsync(x => x.ColumnId.Equals(task.ColumnId) && x.Title.Equals(request.Title) && !x.Id.Equals(taskId)))
+            //    throw new CustomException("Task name has existed in this Column");
 
             _mapper.Map(request, task);
 
@@ -116,7 +116,7 @@ namespace Services.TaskServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task Reorder(TaskReorderRequestModel request)
+        public async Task Reorder(TaskReorderRequest request)
         {
             var task = await _unitOfWork.Tasks.SingleOrDefaultAsync(t => t.Id.Equals(request.TaskId));
             if (task == null) throw new CustomException("Task not found");

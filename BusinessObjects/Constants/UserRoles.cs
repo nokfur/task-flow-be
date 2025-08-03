@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.Constants
 {
-    public enum UserRoleEnum
+    public static class UserRoles
     {
-        Admin,
-        User
+        public const string Admin = "Admin";
+        public const string User = "User";
     }
 }

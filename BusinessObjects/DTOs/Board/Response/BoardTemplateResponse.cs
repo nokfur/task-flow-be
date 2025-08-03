@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BusinessObjects.DTOs.User.Response;
+using BusinessObjects.DTOs.Column.Response;
 
 namespace BusinessObjects.DTOs.Board.Response
 {
-    public class BoardResponseModel
+    public class BoardTemplateResponse
     {
         public string Id { get; set; } = null!;
 
@@ -19,14 +19,6 @@ namespace BusinessObjects.DTOs.Board.Response
 
         public DateTime UpdatedAt { get; set; }
 
-        public int ColumnCount { get; set; }
-
-        public int TaskCount { get; set; }
-
-        public int LabelCount { get; set; }
-
-        public bool isOwn { get; set; }
-
-        public ICollection<UserProfileResponseModel> Members { get; set; } = new List<UserProfileResponseModel>();
+        public ICollection<string> Columns { get; set; } = new List<string>();
     }
 }

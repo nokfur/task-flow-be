@@ -7,11 +7,8 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.DTOs.Label.Request
 {
-    public class LabelTemplateAddRequestModel
+    public class LabelAddRequest
     {
-        [Required]
-        public string Id { get; set; } = null!;
-
         [Required]
         public string Name { get; set; } = null!;
 

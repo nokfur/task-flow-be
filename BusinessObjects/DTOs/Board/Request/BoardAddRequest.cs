@@ -8,7 +8,7 @@ using BusinessObjects.DTOs.User.Request;
 
 namespace BusinessObjects.DTOs.Board.Request
 {
-    public class BoardAddRequestModel
+    public class BoardAddRequest
     {
         [Required]
         public string Title { get; set; } = null!;
@@ -17,6 +17,6 @@ namespace BusinessObjects.DTOs.Board.Request
 
         public string? TemplateId { get; set; }
 
-        public ICollection<MemberAddRequestModal> Members { get; set; } = new List<MemberAddRequestModal>();
+        public ICollection<MemberAddRequest> BoardMembers { get; set; } = new List<MemberAddRequest>();
     }
 }

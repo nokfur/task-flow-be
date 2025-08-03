@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessObjects.Constants;
 using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 using WorkTask = BusinessObjects.Models.WorkTask;
@@ -145,6 +146,17 @@ namespace BusinessObjects
                 .HasMany(x => x.Labels)
                 .WithMany(x => x.Tasks)
                 .UsingEntity<TaskLabel>();
+
+            modelBuilder.Entity<User>().HasData(new User
+            {
+                Id = "17d88407-91ce-4b33-8fbb-9639b12a495e",
+                Name = "Admin",
+                Email = "admin",
+                Password = "Vcdy30nqeMZFh2FCVp2F8uktoTqQcJcKU6Bf0oS2o30=", // 12345
+                Salt = "8GpL6j9M7maqTG/s928A0w==",
+                CreatedAt = new DateTime(2025, 5, 22, 15, 30, 0),
+                Role = UserRoles.Admin
+            });
         }
     }
 }

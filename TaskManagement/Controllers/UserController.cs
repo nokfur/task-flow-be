@@ -1,4 +1,6 @@
 ﻿using System.Security.Claims;
+using BusinessObjects.Constants;
+using BusinessObjects.DTOs.User.Request;
 using BusinessObjects.DTOs.User.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,14 +30,35 @@ namespace TaskManagement.Controllers
             return Ok(user);
         }
 
+        [HttpPut]
+        [Route("me")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile(UserProfileUpdateRequest request)
+        {
+            string? currentUserId = HttpContext.User.FindFirstValue("id");
+            var response = await _userService.UpdateUserProfile(currentUserId, request);
+            return Ok(response);
+        }
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> SearchUser(string? search, [FromBody] List<string> exeptIds)
         {
-            if (string.IsNullOrEmpty(search)) return Ok(new List<UserProfileResponseModel>());
+            if (string.IsNullOrEmpty(search)) return Ok(new List<UserProfileResponse>());
 
             var response = await _userService.SearchUser(search, exeptIds);
             return Ok(response);
         }
+
+        [HttpPatch]
+        [Authorize]
+        [Route("password")]
+        public async Task<IActionResult> ChangePassword(UserChangePasswordRequest request)
+        {
+            string? userId = HttpContext.User.FindFirstValue("id");
+            await _userService.ChangePassword(request, userId);
+
+            return Ok();
+        }        
     }
 }

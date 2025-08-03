@@ -24,7 +24,7 @@ namespace TaskManagement.Controllers
         [HttpPut]
         [Authorize]
         [Route("{columnId}")]
-        public async Task<IActionResult> UpdateColumn(string columnId, ColumnUpdateRequestModel request)
+        public async Task<IActionResult> UpdateColumn(string columnId, ColumnUpdateRequest request)
         {
             await _columnService.UpdateColumn(columnId, request);
             return Ok();
@@ -33,7 +33,7 @@ namespace TaskManagement.Controllers
         [HttpPatch]
         [Authorize]
         [Route("positions")]
-        public async Task<IActionResult> UpdateColumnPositions(List<ColumnPositionUpdateRequestModel> request)
+        public async Task<IActionResult> UpdateColumnPositions(List<ColumnPositionUpdateRequest> request)
         {
             await _columnService.UpdateColumnPositions(request);
             return Ok();
@@ -51,7 +51,7 @@ namespace TaskManagement.Controllers
         [HttpPost]
         [Authorize]
         [Route("{columnId}/tasks")]
-        public async Task<IActionResult> AddTask(string columnId, TaskAddRequestModel request)
+        public async Task<IActionResult> AddTask(string columnId, TaskAddRequest request)
         {
             var task = await _taskService.AddTask(columnId, request);
             return Ok(task);
