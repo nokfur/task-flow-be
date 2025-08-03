@@ -77,6 +77,10 @@ The API will be available at:
 - HTTPS: `https://localhost:7165`
 - Swagger UI: `http://localhost:5119/swagger/index.html`
 
+Admin login:
+- Name: admin
+- Password: 12345
+
 ## 🗄️ Database Schema
 
 ### Core Entities
