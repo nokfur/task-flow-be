@@ -1,0 +1,9 @@
+services:
+  task-flow:
+    image: ${DOCKER_REGISTRY-}task-flow
+    build:
+      context: .
+      dockerfile: TaskManagement/Dockerfile
+    ports:
+      - 8080:8080
+    restart: always
