@@ -38,11 +38,11 @@ builder.Services.AddScoped<ILabelService, LabelService>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: "AllowAll",
+    options.AddPolicy(name: builder.Configuration["Cors:PolicyName"] ?? "",
                       policy =>
                       {
                           policy
-                          .AllowAnyOrigin()
+                          .WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                       });
@@ -99,7 +99,7 @@ var app = builder.Build();
     app.UseSwaggerUI();
 //}
 
-app.UseCors("AllowAll");
+app.UseCors(builder.Configuration["Cors:PolicyName"] ?? "");
 
 app.UseHttpsRedirection();
 
