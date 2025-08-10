@@ -40,18 +40,19 @@ namespace Services.BoardServices
         public async Task<BoardDetailResponse> GetBoardDetailById(string id, string? userId)
         {
             var board = await _unitOfWork.Boards.SingleOrDefaultAsync(b => b.Id.Equals(id), 
-                "Members, Labels, Columns, Columns.Tasks, Columns.Tasks.Labels");
+                "Labels, Columns, Columns.Tasks, Columns.Tasks.Labels");
+            var boardMember = await _unitOfWork.BoardMembers.SingleOrDefaultAsync(b => b.BoardId.Equals(id) && b.MemberId.Equals(userId));
 
-            if (board == null) throw new CustomException("Board Id not found");
-            if (!board.IsTemplate && !board.OwnerId.Equals(userId) && !board.Members.Any(m => m.Id.Equals(userId))) 
+            if (board == null) throw new CustomException("Board not found");
+
+            // anyone can get board template
+            // if not, you cannot get it if you are not the owner or a member
+            if (!board.IsTemplate && !board.OwnerId.Equals(userId) && boardMember == null) 
                 throw new CustomException("You are not allowed to access this board", 403);
 
-            var currentBoardMember = await _unitOfWork.BoardMembers
-                .SingleOrDefaultAsync(x => x.BoardId.Equals(id) && x.MemberId.Equals(userId));
-            if (currentBoardMember == null) throw new CustomException("You are not a member of this board");
-
             var response = _mapper.Map<BoardDetailResponse>(board);
-            response.UserRole = currentBoardMember.Role;
+            // handle case that admin is not a board member
+            response.UserRole = boardMember?.Role ?? "";
 
             return response;
         }
@@ -197,14 +198,14 @@ namespace Services.BoardServices
             if (board == null)
                 throw new CustomException("Board not found", StatusCodes.Status404NotFound);
 
-            if (boardMember == null)
+            // Permission check
+            var isNotOwner = !board.OwnerId.Equals(userId);
+            var isJustMember = boardMember?.Role == BoardMemberRole.Member;
+
+            if (isNotOwner && boardMember == null)
                 throw new CustomException("You are not a member of this board", StatusCodes.Status403Forbidden);
 
-            // Permission check
-            var isNotAdmin = boardMember.Member?.Role != UserRoles.Admin;
-            var isJustMember = boardMember.Role == BoardMemberRole.Member;
-
-            if ((board.IsTemplate && isNotAdmin) || (!board.IsTemplate && isJustMember))
+            if ((board.IsTemplate && isNotOwner) || (!board.IsTemplate && isJustMember))
                 throw new CustomException("You are not allowed to perform this action", StatusCodes.Status403Forbidden);
 
             // Title uniqueness check
