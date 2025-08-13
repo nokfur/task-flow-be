@@ -11,6 +11,7 @@ using Services.LabelServices;
 using Services.TaskServices;
 using Services.UserServices;
 using Services.Utils;
+using TaskManagement.Hubs;
 using TaskManagement.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,7 +45,8 @@ builder.Services.AddCors(options =>
                           policy
                           .WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                       });
 });
 
@@ -90,6 +92,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -100,6 +104,7 @@ var app = builder.Build();
 //}
 
 app.UseCors(builder.Configuration["Cors:PolicyName"] ?? "");
+app.MapHub<BoardHub>("/board-hub");
 
 app.UseHttpsRedirection();
 
