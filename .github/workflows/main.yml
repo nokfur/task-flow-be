@@ -35,7 +35,7 @@ jobs:
             -e NUGET_PACKAGES=/tmp/nuget \
             mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} \
             bash -c "dotnet tool install --global dotnet-ef && \
-                     export PATH=\$PATH:/root/.dotnet/tools && \
+                     export PATH=\$PATH:/tmp/.dotnet/tools && \
                      dotnet ef database update"
 
       - name: Run app containers
