@@ -14,8 +14,8 @@ jobs:
       DOTNET_VERSION: '8.0'
       PROJECT_DIR: TaskManagement
       DB_CONTAINER_NAME: sqlserver
-      DB_CONNECTION: '${{ secrets.DB_CONNECTION }}'
-      JWT_KEY: '${{ secrets.JWT_KEY }}'
+      DB_CONNECTION: "${{ secrets.DB_CONNECTION }}"
+      JWT_KEY: "${{ secrets.JWT_KEY }}"
 
     steps:
       - name: Checkout code
