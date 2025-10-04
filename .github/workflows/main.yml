@@ -7,8 +7,9 @@ on:
       - main
 
 jobs:
-  apply-migration:
-    runs-on: ubuntu-latest
+  docker-compose:
+    runs-on: self-hosted
+    environment: docker
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -23,14 +24,7 @@ jobs:
             cd TaskManagement
             dotnet tool install --global dotnet-ef
             dotnet tool restore
-            dotnet-ef database update
-
-  docker-compose:
-    runs-on: self-hosted
-    environment: docker
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+            dotnet ef database update
         
       - name: Run docker compose
         run: docker compose up --build -d
