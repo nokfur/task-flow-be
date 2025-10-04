@@ -26,12 +26,13 @@ jobs:
         run: |
           docker run --rm \
             --network container:${DB_CONTAINER_NAME} \
-            -u $(id -u):$(id -g) \
             -v ${{ github.workspace }}:/src \
             -w /src/${PROJECT_DIR} \
             -e ASPNETCORE_ENVIRONMENT=Production \
             -e ConnectionStrings__DefaultConnection="$ConnectionStrings__DefaultConnection" \
             -e Jwt__Key="$Jwt__Key" \
+            -e DOTNET_CLI_HOME=/tmp \
+            -e NUGET_PACKAGES=/tmp/nuget \
             mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} \
             bash -c "dotnet tool install --global dotnet-ef && \
                      export PATH=\$PATH:/root/.dotnet/tools && \
