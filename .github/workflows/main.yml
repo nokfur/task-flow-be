@@ -24,6 +24,7 @@ jobs:
             --network container:${DB_CONTAINER_NAME} \
             -v ${{ github.workspace }}:/src \
             -w /src/${PROJECT_DIR} \
+            -e ASPNETCORE_ENVIRONMENT=Production
             mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} \
             bash -c "dotnet tool install --global dotnet-ef && \
                      export PATH=\$PATH:/root/.dotnet/tools && \
