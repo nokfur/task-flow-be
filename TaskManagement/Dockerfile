@@ -29,4 +29,5 @@ FROM base AS final
 RUN apk add --no-cache icu-libs
 WORKDIR /app
 COPY --from=publish /app/publish .
+USER $APP_UID
 ENTRYPOINT ["dotnet", "TaskManagement.dll"]
