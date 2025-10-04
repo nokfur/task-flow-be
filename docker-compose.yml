@@ -11,8 +11,9 @@ services:
       - 8080:8080
     restart: always
     networks:
-      - bridge 
+      - network1 
 
 networks:
-  bridge:
+  network1:
+    name: bridge
     external: true
