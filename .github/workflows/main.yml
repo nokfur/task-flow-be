@@ -14,8 +14,8 @@ jobs:
       DOTNET_VERSION: '8.0'
       PROJECT_DIR: TaskManagement
       DB_CONTAINER_NAME: sqlserver
-      ConnectionStrings__DefaultConnection: '${{ secrets.DB_CONNECTION }}'
-      Jwt__Key: '${{ secrets.JWT_KEY }}'
+      DB_CONNECTION: '${{ secrets.DB_CONNECTION }}'
+      JWT_KEY: '${{ secrets.JWT_KEY }}'
 
     steps:
       - name: Checkout code
@@ -29,8 +29,8 @@ jobs:
             -v ${{ github.workspace }}:/src \
             -w /src/${PROJECT_DIR} \
             -e ASPNETCORE_ENVIRONMENT=Production \
-            -e ConnectionStrings__DefaultConnection="$ConnectionStrings__DefaultConnection" \
-            -e Jwt__Key="$Jwt__Key" \
+            -e ConnectionStrings__DefaultConnection="$DB_CONNECTION" \
+            -e Jwt__Key="$JWT_KEY" \
             -e DOTNET_CLI_HOME=/tmp \
             -e NUGET_PACKAGES=/tmp/nuget \
             mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} \
@@ -44,4 +44,7 @@ jobs:
           find ${{ github.workspace }} -type d \( -name bin -o -name obj \) -exec rm -rf {} +
 
       - name: Run app containers
-        run: docker compose up --build -d
+        run: |
+ 	  export DB_CONNECTION="$DB_CONNECTION" \
+          export JWT_KEY="$JWT_KEY" \
+	  docker compose up --build -d
