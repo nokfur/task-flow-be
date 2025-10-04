@@ -39,6 +39,7 @@ namespace Services.UserServices
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credential = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var expireTime = int.Parse(_config["Jwt:ExpiryInMinutes"] ?? "");
 
             List<Claim> accessClaims = new()
             {
@@ -53,7 +54,7 @@ namespace Services.UserServices
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: accessClaims,
-                expires: DateTime.Now.AddHours(2),
+                expires: DateTime.Now.AddMinutes(expireTime),
                 signingCredentials: credential
                 );
 

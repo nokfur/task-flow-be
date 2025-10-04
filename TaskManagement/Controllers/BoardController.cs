@@ -7,10 +7,12 @@ using BusinessObjects.DTOs.User.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Services.BoardServices;
 using Services.ColumnServices;
 using Services.LabelServices;
 using Services.UserServices;
+using TaskManagement.Hubs;
 
 namespace TaskManagement.Controllers
 {
@@ -23,7 +25,10 @@ namespace TaskManagement.Controllers
         private readonly ILabelService _labelService;
         private readonly IUserService _userService;
 
-        public BoardController(IBoardService boardService, IColumnService columnService, ILabelService labelService, IUserService userService)
+        public BoardController(IBoardService boardService, 
+            IColumnService columnService, 
+            ILabelService labelService, 
+            IUserService userService)
         {
             _boardService = boardService;
             _columnService = columnService;
