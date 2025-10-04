@@ -22,7 +22,6 @@ jobs:
         run: |
           docker run --rm \
             --network container:${DB_CONTAINER_NAME} \
-            -u $(id -u):$(id -g) \
             -v ${{ github.workspace }}:/src \
             -w /src/${PROJECT_DIR} \
             -e ASPNETCORE_ENVIRONMENT=Production \
