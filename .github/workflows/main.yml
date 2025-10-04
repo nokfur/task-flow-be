@@ -45,6 +45,6 @@ jobs:
 
       - name: Run app containers
         run: |
- 	  export DB_CONNECTION="$DB_CONNECTION" \
-          export JWT_KEY="$JWT_KEY" \
-	  docker compose up --build -d
+          export DB_CONNECTION="$DB_CONNECTION"
+          export JWT_KEY="$JWT_KEY"
+          docker compose up --build -d
