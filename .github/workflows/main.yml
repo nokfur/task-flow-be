@@ -11,20 +11,26 @@ jobs:
     runs-on: self-hosted
     environment: docker
     env:
-      DOTNET_VERSION: "8.0"
-      PROJECT_DIR: "TaskManagement"
-      DB_CONTAINER_NAME: "sqlserver"
+      DOTNET_VERSION: '8.0'
+      PROJECT_DIR: TaskManagement
+      DB_CONTAINER_NAME: sqlserver
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
       - name: Run migrations inside container
+        env:
+          ConnectionStrings__DefaultConnection: '${{ secrets.DB_CONNECTION }}'
+          Jwt__Key: '${{ secrets.JWT_KEY }}'
         run: |
           docker run --rm \
             --network container:${DB_CONTAINER_NAME} \
             -v ${{ github.workspace }}:/src \
             -w /src/${PROJECT_DIR} \
             -e ASPNETCORE_ENVIRONMENT=Production \
+            -e ConnectionStrings__DefaultConnection="$ConnectionStrings__DefaultConnection" \
+            -e Jwt__Key="$Jwt__Key" \
             mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} \
             bash -c "dotnet tool install --global dotnet-ef && \
                      export PATH=\$PATH:/root/.dotnet/tools && \
@@ -32,4 +38,3 @@ jobs:
 
       - name: Run app containers
         run: docker compose up --build -d
-
