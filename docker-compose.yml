@@ -1,6 +1,9 @@
 services:
   task-flow:
-    image: ${DOCKER_REGISTRY-}task-flow
+    image: task-flow
+    environment:
+      ConnectionStrings__DefaultConnection: "${DB_CONNECTION}"
+      Jwt__Key: "${JWT_KEY}"
     build:
       context: .
       dockerfile: TaskManagement/Dockerfile
