@@ -17,7 +17,7 @@ jobs:
       - name: Run migrations inside container
         run: |
           docker run --rm \
-            --network container:sqlserver \ # or use the same docker network name
+            --network container:sqlserver \
             -v ${{ github.workspace }}:/src \
             -w /src/InteractiveFloor \
             mcr.microsoft.com/dotnet/sdk:8.0 \
