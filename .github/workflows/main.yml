@@ -1,0 +1,36 @@
+name: CI/CD Pipeline
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+
+jobs:
+  apply-migration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Migration DB
+        run: |
+            cd TaskManagement
+            dotnet tool install --global dotnet-ef
+            dotnet tool restore
+            dotnet-ef database update
+
+  docker-compose:
+    runs-on: self-hosted
+    environment: docker
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        
+      - name: Run docker compose
+        run: docker compose up --build -d
