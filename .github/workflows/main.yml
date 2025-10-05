@@ -7,42 +7,40 @@ on:
       - main
 
 jobs:
-  docker-compose:
-    runs-on: self-hosted
-    environment: docker
+  apply-migration:
+    runs-on: ubuntu-latest
     env:
-      DOTNET_VERSION: '8.0'
+      DOTNET_VERSION: '8.0.x'
       PROJECT_DIR: TaskManagement
-      DB_CONTAINER_NAME: sqlserver
       DB_CONNECTION: "${{ secrets.DB_CONNECTION }}"
-      JWT_KEY: "${{ secrets.JWT_KEY }}"
-
+      CONNECTION_KEY: "ConnectionStrings__DefaultConnection"
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Run migrations inside container
-        run: |
-          docker run --rm \
-            --network container:${DB_CONTAINER_NAME} \
-            -u $(id -u):$(id -g) \
-            -v ${{ github.workspace }}:/src \
-            -w /src/${PROJECT_DIR} \
-            -e ASPNETCORE_ENVIRONMENT=Production \
-            -e ConnectionStrings__DefaultConnection="$DB_CONNECTION" \
-            -e Jwt__Key="$JWT_KEY" \
-            -e DOTNET_CLI_HOME=/tmp \
-            -e NUGET_PACKAGES=/tmp/nuget \
-            mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} \
-            bash -c "dotnet tool install --global dotnet-ef && \
-                     export PATH=\$PATH:/tmp/.dotnet/tools && \
-                     dotnet ef database update"
-      
-      - name: Cleanup build artifacts
-        run: |
-          echo "Cleaning bin/ and obj/ folders..."
-          find ${{ github.workspace }} -type d \( -name bin -o -name obj \) -exec rm -rf {} +
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${DOTNET_VERSION}
 
+      - name: Migration DB
+        run: |
+            cd ${PROJECT_DIR}
+            dotnet tool install --global dotnet-ef
+            dotnet tool restore
+            export "${CONNECTION_KEY}=$DB_CONNECTION"
+            dotnet-ef database update
+
+  docker-compose:
+    runs-on: self-hosted
+    environment: docker
+    env:
+      DB_CONNECTION: "${{ secrets.DB_CONNECTION }}"
+      JWT_KEY: "${{ secrets.JWT_KEY }}"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        
       - name: Run app containers
         run: |
           export DB_CONNECTION="$DB_CONNECTION"
